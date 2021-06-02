@@ -2,4 +2,9 @@
     <string name="app_name">Conveyor Fight</string>
     <string name="fight_fragment">fight fragment</string>
     <string name="shop_fragment">shop fragment</string>
+    <string name="fight_to_shop_btn">Shop</string>
+    <string name="fight_to_menu_btn">Menu</string>
+    <string name="shop_to_fight_btn">Fight</string>
+    <string name="menu_to_fight_btn">Play</string>
+    <string name="menu_fragment">Menu</string>
 </resources>

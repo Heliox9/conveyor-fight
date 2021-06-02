@@ -1,10 +1,12 @@
 package de.conveyorfight.fight
 
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
+import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.NavHostFragment
 import de.conveyorfight.R
 
 // TODO: Rename parameter arguments, choose names that match
@@ -36,7 +38,17 @@ class FightFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_fight, container, false)
+        val view = inflater.inflate(R.layout.fragment_fight, container, false)
+
+        view.findViewById<Button>(R.id.fight_to_menu_button).setOnClickListener {
+            NavHostFragment.findNavController(this)
+                .navigate(R.id.action_fightFragment_to_menuFragment)
+        }
+        view.findViewById<Button>(R.id.fight_to_shop_button).setOnClickListener {
+            NavHostFragment.findNavController(this)
+                .navigate(R.id.action_fightFragment_to_shopFragment)
+        }
+        return view
     }
 
     companion object {
