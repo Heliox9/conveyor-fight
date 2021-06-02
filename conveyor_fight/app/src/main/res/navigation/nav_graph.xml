@@ -13,6 +13,9 @@
         <action
             android:id="@+id/action_fightFragment_to_menuFragment"
             app:destination="@id/menuFragment" />
+        <action
+            android:id="@+id/action_fightFragment_to_shopFragment"
+            app:destination="@id/shopFragment" />
     </fragment>
     <fragment
         android:id="@+id/menuFragment"
@@ -21,6 +24,15 @@
         tools:layout="@layout/fragment_menu">
         <action
             android:id="@+id/action_menuFragment_to_fightFragment"
+            app:destination="@id/fightFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/shopFragment"
+        android:name="de.conveyorfight.shop.ShopFragment"
+        android:label="fragment_shop"
+        tools:layout="@layout/fragment_shop" >
+        <action
+            android:id="@+id/action_shopFragment_to_fightFragment"
             app:destination="@id/fightFragment" />
     </fragment>
 </navigation>

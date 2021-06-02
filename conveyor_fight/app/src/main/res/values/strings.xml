@@ -1,4 +1,5 @@
 <resources>
     <string name="app_name">Conveyor Fight</string>
     <string name="fight_fragment">fight fragment</string>
+    <string name="shop_fragment">shop fragment</string>
 </resources>
