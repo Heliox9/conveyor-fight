@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/menuFragment">
+
+    <fragment
+        android:id="@+id/fightFragment"
+        android:name="de.conveyorfight.fight.FightFragment"
+        android:label="fragment_fight"
+        tools:layout="@layout/fragment_fight">
+        <action
+            android:id="@+id/action_fightFragment_to_menuFragment"
+            app:destination="@id/menuFragment" />
+        <action
+            android:id="@+id/action_fightFragment_to_shopFragment"
+            app:destination="@id/shopFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/menuFragment"
+        android:name="de.conveyorfight.menu.MenuFragment"
+        android:label="fragment_menu"
+        tools:layout="@layout/fragment_menu">
+        <action
+            android:id="@+id/action_menuFragment_to_fightFragment"
+            app:destination="@id/fightFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/shopFragment"
+        android:name="de.conveyorfight.shop.ShopFragment"
+        android:label="fragment_shop"
+        tools:layout="@layout/fragment_shop" >
+        <action
+            android:id="@+id/action_shopFragment_to_fightFragment"
+            app:destination="@id/fightFragment" />
+    </fragment>
+</navigation>
