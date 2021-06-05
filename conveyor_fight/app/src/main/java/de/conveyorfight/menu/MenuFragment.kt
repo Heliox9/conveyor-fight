@@ -5,6 +5,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
+import android.widget.ImageButton
+import android.widget.SeekBar
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.NavHostFragment
@@ -32,7 +34,6 @@ class MenuFragment : Fragment() {
             param2 = it.getString(ARG_PARAM2)
         }
 
-
     }
 
     override fun onCreateView(
@@ -41,16 +42,37 @@ class MenuFragment : Fragment() {
     ): View? {
         val view = inflater.inflate(R.layout.fragment_menu, container, false)
 
+        // main navigation action
+        // TODO change to matchmaking logic
         view.findViewById<Button>(R.id.menu_play_button).setOnClickListener {
             NavHostFragment.findNavController(this)
                 .navigate(R.id.action_menuFragment_to_fightFragment)
         }
 
+        // Volume bar visibility toggles
+        view.findViewById<ImageButton>(R.id.effect_volume_btn).setOnClickListener {
+            toggleVisibility(view.findViewById<SeekBar>(R.id.effect_seekBar))
+        }
+        view.findViewById<ImageButton>(R.id.music_volume_btn).setOnClickListener {
+            toggleVisibility(view.findViewById<SeekBar>(R.id.music_seekBar))
+        }
+
+        // TODO SeekBar change listener logic
+        view.findViewById<SeekBar>(R.id.music_seekBar)
+        view.findViewById<SeekBar>(R.id.effect_seekBar)
+
+
+        // set screen background resource
         view.findViewById<ConstraintLayout>(R.id.menu_layout)
             .setBackgroundResource(R.drawable.menu_background)
 
         // Inflate the layout for this fragment
         return view
+    }
+
+    private fun toggleVisibility(seek: SeekBar) {
+        if (seek.visibility == View.VISIBLE) seek.visibility = View.INVISIBLE
+        else seek.visibility = View.VISIBLE
     }
 
     companion object {

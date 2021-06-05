@@ -10,13 +10,14 @@
     <!--TODO replace background-->
     <Button
         android:id="@+id/menu_play_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="150dp"
+        android:layout_height="80dp"
         android:text="@string/menu_to_fight_btn"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        />
 
     <!--    TODO replace placeholder icons-->
     <ImageButton
@@ -38,4 +39,26 @@
         app:layout_constraintTop_toTopOf="parent"
         tools:layout_editor_absoluteX="418dp"
         tools:layout_editor_absoluteY="39dp" />
+
+    <SeekBar
+        android:id="@+id/music_seekBar"
+        android:layout_width="200dp"
+        android:layout_height="0dp"
+        android:background="@color/white"
+        android:visibility="invisible"
+        app:layout_constraintBottom_toBottomOf="@id/music_volume_btn"
+        app:layout_constraintStart_toEndOf="@id/music_volume_btn"
+        app:layout_constraintTop_toTopOf="@id/music_volume_btn" />
+    <!--TODO change background color-->
+
+    <SeekBar
+        android:id="@+id/effect_seekBar"
+        android:layout_width="200dp"
+        android:layout_height="0dp"
+        android:background="@color/white"
+        android:visibility="invisible"
+        app:layout_constraintBottom_toBottomOf="@id/effect_volume_btn"
+        app:layout_constraintEnd_toStartOf="@id/effect_volume_btn"
+        app:layout_constraintTop_toTopOf="@id/effect_volume_btn" />
+    <!--TODO change background color-->
 </androidx.constraintlayout.widget.ConstraintLayout>
