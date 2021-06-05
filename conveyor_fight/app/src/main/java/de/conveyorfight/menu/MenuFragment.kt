@@ -5,6 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.NavHostFragment
 import de.conveyorfight.R
@@ -44,6 +45,10 @@ class MenuFragment : Fragment() {
             NavHostFragment.findNavController(this)
                 .navigate(R.id.action_menuFragment_to_fightFragment)
         }
+
+        view.findViewById<ConstraintLayout>(R.id.menu_layout)
+            .setBackgroundResource(R.drawable.menu_background)
+
         // Inflate the layout for this fragment
         return view
     }
