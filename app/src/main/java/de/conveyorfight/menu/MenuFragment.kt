@@ -64,7 +64,7 @@ class MenuFragment : Fragment() {
 
         // set screen background resource
         view.findViewById<ConstraintLayout>(R.id.menu_layout)
-            .setBackgroundResource(R.drawable.menu_background)
+            .setBackgroundResource(R.drawable.background_menu)
 
         // Inflate the layout for this fragment
         return view
