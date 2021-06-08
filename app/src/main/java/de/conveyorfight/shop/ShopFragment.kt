@@ -8,6 +8,7 @@ import android.view.ViewGroup
 import android.widget.Button
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.NavHostFragment
+import de.conveyorfight.ConveyorApplication
 import de.conveyorfight.R
 
 // TODO: Rename parameter arguments, choose names that match
@@ -34,9 +35,16 @@ class ShopFragment : Fragment() {
             param2 = it.getString(ARG_PARAM2)
         }
 
+
+        val application: ConveyorApplication =
+            (this.activity?.application) as ConveyorApplication
         //TODO change to actual media file
-        mediaPlayer = MediaPlayer.create(context, R.raw.playerexplode)
+        mediaPlayer = MediaPlayer.create(context, R.raw.track_main)
         mediaPlayer.isLooping = true
+        mediaPlayer.setVolume(
+            application.volumeMusic.toFloat() / application.volumeEffectMax,
+            application.volumeMusic.toFloat() / application.volumeEffectMax
+        )
     }
 
     override fun onStart() {

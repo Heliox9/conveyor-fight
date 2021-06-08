@@ -10,6 +10,7 @@ import android.widget.SeekBar
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.NavHostFragment
+import de.conveyorfight.ConveyorApplication
 import de.conveyorfight.R
 
 // TODO: Rename parameter arguments, choose names that match
@@ -51,16 +52,25 @@ class MenuFragment : Fragment() {
 
         // Volume bar visibility toggles
         view.findViewById<ImageButton>(R.id.effect_volume_btn).setOnClickListener {
-            toggleVisibility(view.findViewById<SeekBar>(R.id.effect_seekBar))
+            toggleVisibility(view.findViewById(R.id.effect_seekBar))
         }
         view.findViewById<ImageButton>(R.id.music_volume_btn).setOnClickListener {
-            toggleVisibility(view.findViewById<SeekBar>(R.id.music_seekBar))
+            toggleVisibility(view.findViewById(R.id.music_seekBar))
         }
 
-        // TODO SeekBar change listener logic
-        view.findViewById<SeekBar>(R.id.music_seekBar)
-        view.findViewById<SeekBar>(R.id.effect_seekBar)
+        // SeekBar change listener logic
+        val application: ConveyorApplication =
+            (this.activity?.application) as ConveyorApplication
 
+        val music = view.findViewById<SeekBar>(R.id.music_seekBar)
+        music.progress = application.volumeMusic
+        music.max = application.volumeMusicMax
+        music.setOnSeekBarChangeListener(CustomSeekListener(application, true))
+
+        val effect = view.findViewById<SeekBar>(R.id.effect_seekBar)
+        effect.progress = application.volumeEffect
+        effect.max = application.volumeEffectMax
+        effect.setOnSeekBarChangeListener(CustomSeekListener(application, false))
 
         // set screen background resource
         view.findViewById<ConstraintLayout>(R.id.menu_layout)
@@ -68,6 +78,24 @@ class MenuFragment : Fragment() {
 
         // Inflate the layout for this fragment
         return view
+    }
+
+    private class CustomSeekListener(val application: ConveyorApplication, val music: Boolean) :
+        SeekBar.OnSeekBarChangeListener {
+        override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
+            if (music) application.volumeMusic = progress
+            else application.volumeEffect = progress
+            println(progress)
+        }
+
+        override fun onStartTrackingTouch(seekBar: SeekBar?) {
+//            TODO("Not yet implemented")
+        }
+
+        override fun onStopTrackingTouch(seekBar: SeekBar?) {
+//            TODO("Not yet implemented")
+        }
+
     }
 
     private fun toggleVisibility(seek: SeekBar) {
