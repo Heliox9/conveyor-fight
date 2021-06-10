@@ -1,6 +1,7 @@
 package de.conveyorfight
 
 import android.content.pm.ActivityInfo
+import android.media.MediaPlayer
 import android.os.Build
 import android.os.Bundle
 import android.view.View
@@ -9,6 +10,10 @@ import android.view.WindowInsetsController
 import androidx.appcompat.app.AppCompatActivity
 
 class MainActivity : AppCompatActivity() {
+
+    var mediaPlayer: MediaPlayer? = null
+
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -16,6 +21,34 @@ class MainActivity : AppCompatActivity() {
         // set landscape view
         // TODO enable inverse landscape functionality
         requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
+
+
+    }
+
+    fun changeTrack(trackId: Int) {
+        mediaPlayer?.stop()
+        mediaPlayer = MediaPlayer.create(this, trackId)
+        mediaPlayer?.isLooping = true
+        setVolume()
+        mediaPlayer?.start()
+    }
+
+    fun setVolume() {
+        val application: ConveyorApplication =
+            (application) as ConveyorApplication
+        mediaPlayer?.setVolume(
+            application.volumeMusic.toFloat() / application.volumeEffectMax,
+            application.volumeMusic.toFloat() / application.volumeEffectMax
+        )
+    }
+
+    override fun onStart() {
+        super.onStart()
+    }
+
+    override fun onStop() {
+        super.onStop()
+        mediaPlayer?.release()
     }
 
     override fun onWindowFocusChanged(hasFocus: Boolean) {

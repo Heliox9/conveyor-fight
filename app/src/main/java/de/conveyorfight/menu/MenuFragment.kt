@@ -11,6 +11,7 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.NavHostFragment
 import de.conveyorfight.ConveyorApplication
+import de.conveyorfight.MainActivity
 import de.conveyorfight.R
 
 // TODO: Rename parameter arguments, choose names that match
@@ -59,18 +60,31 @@ class MenuFragment : Fragment() {
         }
 
         // SeekBar change listener logic
+        val activity = activity as MainActivity
         val application: ConveyorApplication =
-            (this.activity?.application) as ConveyorApplication
+            (activity.application) as ConveyorApplication
 
         val music = view.findViewById<SeekBar>(R.id.music_seekBar)
         music.progress = application.volumeMusic
         music.max = application.volumeMusicMax
-        music.setOnSeekBarChangeListener(CustomSeekListener(application, true))
+        music.setOnSeekBarChangeListener(
+            CustomSeekListener(
+                application,
+                activity, true
+            )
+        )
 
         val effect = view.findViewById<SeekBar>(R.id.effect_seekBar)
         effect.progress = application.volumeEffect
         effect.max = application.volumeEffectMax
-        effect.setOnSeekBarChangeListener(CustomSeekListener(application, false))
+        effect.setOnSeekBarChangeListener(
+            CustomSeekListener(
+                application,
+                activity, false
+            )
+        )
+
+        activity.changeTrack(R.raw.track_menu)
 
         // set screen background resource
         view.findViewById<ConstraintLayout>(R.id.menu_layout)
@@ -80,12 +94,16 @@ class MenuFragment : Fragment() {
         return view
     }
 
-    private class CustomSeekListener(val application: ConveyorApplication, val music: Boolean) :
+    private class CustomSeekListener(
+        val application: ConveyorApplication,
+        val activity: MainActivity,
+        val music: Boolean
+    ) :
         SeekBar.OnSeekBarChangeListener {
         override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
             if (music) application.volumeMusic = progress
             else application.volumeEffect = progress
-            println(progress)
+
         }
 
         override fun onStartTrackingTouch(seekBar: SeekBar?) {
@@ -93,7 +111,8 @@ class MenuFragment : Fragment() {
         }
 
         override fun onStopTrackingTouch(seekBar: SeekBar?) {
-//            TODO("Not yet implemented")
+            // update volumes
+            activity.setVolume()
         }
 
     }

@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import android.widget.Button
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.NavHostFragment
+import de.conveyorfight.MainActivity
 import de.conveyorfight.R
 
 // TODO: Rename parameter arguments, choose names that match
@@ -48,6 +49,8 @@ class FightFragment : Fragment() {
             NavHostFragment.findNavController(this)
                 .navigate(R.id.action_fightFragment_to_shopFragment)
         }
+
+        (activity as MainActivity).changeTrack(R.raw.track_main)
         return view
     }
 

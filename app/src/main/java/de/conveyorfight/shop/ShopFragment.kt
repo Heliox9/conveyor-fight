@@ -1,6 +1,5 @@
 package de.conveyorfight.shop
 
-import android.media.MediaPlayer
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -8,7 +7,7 @@ import android.view.ViewGroup
 import android.widget.Button
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.NavHostFragment
-import de.conveyorfight.ConveyorApplication
+import de.conveyorfight.MainActivity
 import de.conveyorfight.R
 
 // TODO: Rename parameter arguments, choose names that match
@@ -26,7 +25,6 @@ class ShopFragment : Fragment() {
     private var param1: String? = null
     private var param2: String? = null
 
-    private lateinit var mediaPlayer: MediaPlayer
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -36,21 +34,8 @@ class ShopFragment : Fragment() {
         }
 
 
-        val application: ConveyorApplication =
-            (this.activity?.application) as ConveyorApplication
-        //TODO change to actual media file
-        mediaPlayer = MediaPlayer.create(context, R.raw.track_main)
-        mediaPlayer.isLooping = true
-        mediaPlayer.setVolume(
-            application.volumeMusic.toFloat() / application.volumeEffectMax,
-            application.volumeMusic.toFloat() / application.volumeEffectMax
-        )
     }
 
-    override fun onStart() {
-        super.onStart()
-        mediaPlayer.start()
-    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -63,14 +48,10 @@ class ShopFragment : Fragment() {
             NavHostFragment.findNavController(this)
                 .navigate(R.id.action_shopFragment_to_fightFragment)
         }
-
+        (activity as MainActivity).changeTrack(R.raw.track_main)
         return view
     }
 
-    override fun onStop() {
-        super.onStop()
-        mediaPlayer.release()
-    }
 
     companion object {
         /**
