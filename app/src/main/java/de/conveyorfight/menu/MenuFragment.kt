@@ -107,7 +107,7 @@ class MenuFragment : Fragment() {
         }
 
         override fun onStartTrackingTouch(seekBar: SeekBar?) {
-//            TODO("Not yet implemented")
+            // ("Not yet implemented")
         }
 
         override fun onStopTrackingTouch(seekBar: SeekBar?) {
