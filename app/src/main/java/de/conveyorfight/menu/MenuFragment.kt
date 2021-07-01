@@ -46,7 +46,7 @@ class MenuFragment : Fragment() {
         // TODO change to matchmaking logic
         view.findViewById<Button>(R.id.menu_play_button).setOnClickListener {
             NavHostFragment.findNavController(this)
-                .navigate(R.id.action_menuFragment_to_fightFragment)
+                .navigate(R.id.action_menuFragment_to_aiGameFragment)
         }
 
         // Volume bar visibility toggles

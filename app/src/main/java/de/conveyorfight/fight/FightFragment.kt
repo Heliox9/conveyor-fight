@@ -44,10 +44,6 @@ class FightFragment : Fragment() {
             NavHostFragment.findNavController(this)
                 .navigate(R.id.action_fightFragment_to_menuFragment)
         }
-        view.findViewById<Button>(R.id.fight_to_shop_button).setOnClickListener {
-            NavHostFragment.findNavController(this)
-                .navigate(R.id.action_fightFragment_to_shopFragment)
-        }
         return view
     }
 

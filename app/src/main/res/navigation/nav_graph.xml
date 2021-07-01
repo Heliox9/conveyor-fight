@@ -13,9 +13,6 @@
         <action
             android:id="@+id/action_fightFragment_to_menuFragment"
             app:destination="@id/menuFragment" />
-        <action
-            android:id="@+id/action_fightFragment_to_shopFragment"
-            app:destination="@id/shopFragment" />
     </fragment>
     <fragment
         android:id="@+id/menuFragment"
@@ -25,14 +22,16 @@
         <action
             android:id="@+id/action_menuFragment_to_fightFragment"
             app:destination="@id/fightFragment" />
+        <action
+            android:id="@+id/action_menuFragment_to_aiGameFragment"
+            app:destination="@id/aiGameFragment" />
     </fragment>
     <fragment
-        android:id="@+id/shopFragment"
-        android:name="de.conveyorfight.shop.ShopFragment"
-        android:label="fragment_shop"
-        tools:layout="@layout/fragment_shop" >
+        android:id="@+id/aiGameFragment"
+        android:name="de.conveyorfight.gameFragments.AiGameFragment"
+        android:label="fragment_ai_game">
         <action
-            android:id="@+id/action_shopFragment_to_fightFragment"
-            app:destination="@id/fightFragment" />
+            android:id="@+id/action_aiGameFragment_to_menuFragment"
+            app:destination="@id/menuFragment" />
     </fragment>
 </navigation>
