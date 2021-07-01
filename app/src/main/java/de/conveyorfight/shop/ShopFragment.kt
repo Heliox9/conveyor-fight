@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import android.widget.Button
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.NavHostFragment
+import de.conveyorfight.MainActivity
 import de.conveyorfight.R
 
 // TODO: Rename parameter arguments, choose names that match
@@ -24,13 +25,17 @@ class ShopFragment : Fragment() {
     private var param1: String? = null
     private var param2: String? = null
 
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         arguments?.let {
             param1 = it.getString(ARG_PARAM1)
             param2 = it.getString(ARG_PARAM2)
         }
+
+
     }
+
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -43,9 +48,10 @@ class ShopFragment : Fragment() {
             NavHostFragment.findNavController(this)
                 .navigate(R.id.action_shopFragment_to_fightFragment)
         }
-
+        (activity as MainActivity).changeTrack(R.raw.track_main)
         return view
     }
+
 
     companion object {
         /**

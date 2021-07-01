@@ -1,6 +1,7 @@
 package de.conveyorfight
 
 import android.content.pm.ActivityInfo
+import android.media.MediaPlayer
 import android.os.Build
 import android.os.Bundle
 import android.view.View
@@ -9,6 +10,10 @@ import android.view.WindowInsetsController
 import androidx.appcompat.app.AppCompatActivity
 
 class MainActivity : AppCompatActivity() {
+
+    var mediaPlayer: MediaPlayer? = null
+
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -16,6 +21,46 @@ class MainActivity : AppCompatActivity() {
         // set landscape view
         // TODO enable inverse landscape functionality
         requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
+
+        // TODO save volume levels between startups
+    }
+
+    // save current track do disable changing to same track
+    private var currentTrack: Int? = null
+
+    /**
+     * build and start a new player with the chosen track
+     */
+    fun changeTrack(trackId: Int) {
+        // check if track needs to be changed
+        if (currentTrack != trackId) {
+            // reset player with new track
+            mediaPlayer?.stop()
+            mediaPlayer = MediaPlayer.create(this, trackId)
+            mediaPlayer?.isLooping = true
+
+            // initialize player
+            setVolume()
+            mediaPlayer?.start()
+            currentTrack = trackId
+        }
+    }
+
+    /**
+     * adjust both volume settings to current value in application
+     */
+    fun setVolume() {
+        val application: ConveyorApplication =
+            (application) as ConveyorApplication
+        mediaPlayer?.setVolume(
+            application.volumeMusic.toFloat() / application.volumeEffectMax,
+            application.volumeMusic.toFloat() / application.volumeEffectMax
+        )
+    }
+
+    override fun onStop() {
+        super.onStop()
+        mediaPlayer?.release()
     }
 
     override fun onWindowFocusChanged(hasFocus: Boolean) {
