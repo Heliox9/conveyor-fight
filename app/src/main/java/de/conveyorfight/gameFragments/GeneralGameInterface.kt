@@ -42,10 +42,6 @@ abstract class GeneralGameInterface: Runnable, Fragment(){
 
     abstract fun getEnemyAfterDamage(): Character
 
-    abstract fun damageToEnemy(): Any
-
-    abstract fun damageToPlayer(): Any
-
     abstract fun isPlayerFirst(): Boolean
 
     abstract fun getPlayerCoin(): Int

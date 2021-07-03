@@ -1,3 +1,7 @@
 package de.conveyorfight.assets
 
-data class PropertyDetail(val isElement:Boolean, val isDamage: Boolean, val rarities: List<RarityValue>)
+data class PropertyDetail(
+    val isDamage: Boolean,
+    val blockedBy: Properties?,
+    val rarities: List<RarityValue>
+)
