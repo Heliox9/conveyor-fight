@@ -1,6 +1,9 @@
 package de.conveyorfight.assets
 
 import android.content.Context
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
+import de.conveyorfight.R
 import java.util.*
 
 class Item(val context: Context,
@@ -10,7 +13,7 @@ class Item(val context: Context,
            var cost: Int = 5,
            var properties: ArrayList<PropertyValue> = ArrayList<PropertyValue>()) {
 
-
+    lateinit var bitmap: Bitmap
 
     init {
         if (properties.isEmpty()){
@@ -36,7 +39,10 @@ class Item(val context: Context,
         }
 
         if(itemType == null) {
-            itemType = ItemTypes.values()[Random().nextInt(ItemTypes.values().size)];
+            do {
+                itemType = ItemTypes.values()[Random().nextInt(ItemTypes.values().size)];
+            } while ((itemType == ItemTypes.RangeNull && rarity > 1) ||
+                (itemType == ItemTypes.RangeTwo && rarity > 2))
         }
 
         if (itemType == ItemTypes.Special){
@@ -55,7 +61,7 @@ class Item(val context: Context,
     }
 
     private fun generateNonSpecialItem() {
-        var numberProperties: Int = if (rarity > 1) {
+        var numberProperties: Int = if (rarity == 1) {
             (1..2).random()
         } else {
             (2..4).random()
@@ -99,8 +105,7 @@ class Item(val context: Context,
     }
 
     private fun determineRarity(percentageRarOne: Int, percentageRarTwo: Int): Int {
-        var percentage = (0..100).random()
-        return when (percentage) {
+        return when ((0..100).random()) {
             in 0..percentageRarOne -> 1
             in percentageRarOne + 1..percentageRarTwo -> 2
             else -> 3
@@ -108,15 +113,63 @@ class Item(val context: Context,
     }
 
     fun createBitmap() {
-
-    }
-
-    fun paintFightView() {
-
-    }
-
-    fun updateShopView() {
-
+        bitmap = when(ItemTypeRarity(itemType!!, rarity)) {
+            ItemTypeRarity(ItemTypes.Helmet, 1) ->
+                BitmapFactory.decodeResource(context.resources, R.drawable.leather_helm)
+            ItemTypeRarity(ItemTypes.Helmet, 2) ->
+                BitmapFactory.decodeResource(context.resources, R.drawable.metal_helmet)
+            ItemTypeRarity(ItemTypes.Helmet, 3) ->
+                BitmapFactory.decodeResource(context.resources, R.drawable.epic_helmet)
+            ItemTypeRarity(ItemTypes.Gloves, 1) ->
+                BitmapFactory.decodeResource(context.resources, R.drawable.leather_gloves)
+            ItemTypeRarity(ItemTypes.Gloves, 2) ->
+                BitmapFactory.decodeResource(context.resources, R.drawable.metal_gloves)
+            ItemTypeRarity(ItemTypes.Gloves, 3) ->
+                BitmapFactory.decodeResource(context.resources, R.drawable.epic_gloves)
+            ItemTypeRarity(ItemTypes.Armor, 1) ->
+                BitmapFactory.decodeResource(context.resources, R.drawable.leather_armor)
+            ItemTypeRarity(ItemTypes.Armor, 2) ->
+                BitmapFactory.decodeResource(context.resources, R.drawable.metal_armor)
+            ItemTypeRarity(ItemTypes.Armor, 3) ->
+                BitmapFactory.decodeResource(context.resources, R.drawable.epic_armor)
+            ItemTypeRarity(ItemTypes.Pants, 1) ->
+                BitmapFactory.decodeResource(context.resources, R.drawable.leather_pants)
+            ItemTypeRarity(ItemTypes.Pants, 2) ->
+                BitmapFactory.decodeResource(context.resources, R.drawable.metal_pants)
+            ItemTypeRarity(ItemTypes.Pants, 3) ->
+                BitmapFactory.decodeResource(context.resources, R.drawable.epic_pants)
+            ItemTypeRarity(ItemTypes.Shoes, 1) ->
+                BitmapFactory.decodeResource(context.resources, R.drawable.leather_boots)
+            ItemTypeRarity(ItemTypes.Shoes, 2) ->
+                BitmapFactory.decodeResource(context.resources, R.drawable.metal_shoes)
+            ItemTypeRarity(ItemTypes.Shoes, 3) ->
+                BitmapFactory.decodeResource(context.resources, R.drawable.epic_shoes)
+            ItemTypeRarity(ItemTypes.Special, 1) ->
+                BitmapFactory.decodeResource(context.resources, R.drawable.potion)
+            ItemTypeRarity(ItemTypes.Special, 2) ->
+                BitmapFactory.decodeResource(context.resources, R.drawable.shield)
+            ItemTypeRarity(ItemTypes.Special, 3) ->
+                BitmapFactory.decodeResource(context.resources, R.drawable.magic_wand)
+            ItemTypeRarity(ItemTypes.RangeNull, 1) ->
+                BitmapFactory.decodeResource(context.resources, R.drawable.knuckle_duster)
+            ItemTypeRarity(ItemTypes.RangeTwo, 1) ->
+                BitmapFactory.decodeResource(context.resources, R.drawable.dagger)
+            ItemTypeRarity(ItemTypes.RangeTwo, 2) ->
+                BitmapFactory.decodeResource(context.resources, R.drawable.hammer)
+            ItemTypeRarity(ItemTypes.RangeFour, 1) ->
+                BitmapFactory.decodeResource(context.resources, R.drawable.club)
+            ItemTypeRarity(ItemTypes.RangeFour, 2) ->
+                BitmapFactory.decodeResource(context.resources, R.drawable.axe)
+            ItemTypeRarity(ItemTypes.RangeFour, 3) ->
+                BitmapFactory.decodeResource(context.resources, R.drawable.great_sword)
+            ItemTypeRarity(ItemTypes.RangeSix,1) ->
+                BitmapFactory.decodeResource(context.resources, R.drawable.monkey_staff)
+            ItemTypeRarity(ItemTypes.RangeSix,2) ->
+                BitmapFactory.decodeResource(context.resources, R.drawable.spear)
+            ItemTypeRarity(ItemTypes.RangeSix,3) ->
+                BitmapFactory.decodeResource(context.resources, R.drawable.scythe)
+            else -> return
+        }
     }
 
     fun clone(): Item {

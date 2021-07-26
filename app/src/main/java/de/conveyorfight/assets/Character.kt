@@ -14,7 +14,8 @@ class Character(var hp: Int = 100,
                 var weapon: Item? =null,
                 var propertiesKnown: ArrayList<Properties> = ArrayList<Properties>()) {
 
-
+    //TODO visual (den dude muss ich ja auch zeichenen q.q)
+    //TODO mergen mit Masterstand
 
     fun add(item: Item){
         when(item.itemType){
@@ -67,7 +68,7 @@ class Character(var hp: Int = 100,
             if(item != null){
                 for (property in item.properties){
                     if(property.property.detail.isDamage) {
-                        var isAdded = propertyDamage.find { pd -> pd.property == property.property }
+                        val isAdded = propertyDamage.find { pd -> pd.property == property.property }
                         if (isAdded != null) {
                             isAdded.value += property.value
                         } else {
@@ -87,7 +88,7 @@ class Character(var hp: Int = 100,
             if(item != null){
                 for (property in item.properties){
                     if(!property.property.detail.isDamage) {
-                        var isAdded = propertyArmor.find { pd -> pd.property == property.property }
+                        val isAdded = propertyArmor.find { pd -> pd.property == property.property }
                         if (isAdded != null) {
                             isAdded.value += property.value
                         } else {
