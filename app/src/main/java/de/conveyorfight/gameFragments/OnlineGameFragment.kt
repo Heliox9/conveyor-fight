@@ -10,18 +10,15 @@ import de.conveyorfight.assets.Character
 import de.conveyorfight.assets.Item
 import de.conveyorfight.assets.PropertyValue
 import de.conveyorfight.gameFragments.online.ClientThread
-import de.conveyorfight.gameFragments.online.GameState
 import de.conveyorfight.gameFragments.online.ItemSelection
 
 class OnlineGameFragment : GeneralGameInterface() {
-    lateinit var state: GameState
-    lateinit var items: ItemSelection
-    lateinit var gsonBuilder: GsonBuilder
-    lateinit var gson: Gson
-    lateinit var thread: ClientThread
+    private lateinit var gsonBuilder: GsonBuilder
+    private lateinit var gson: Gson
+    private lateinit var thread: ClientThread
 
-    lateinit var character: Character
-    var money: Int = -42
+    private lateinit var character: Character
+    private var money: Int = -42
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -105,24 +102,24 @@ class OnlineGameFragment : GeneralGameInterface() {
 
     override fun handlePlayerBuy(item: Item) {
         println("handlePlayerBuy")
-        TODO("Not yet implemented")
+        itemSelection.bought.add(item)
+        thread.addOutgoing(gson.toJson(itemSelection))
     }
 
     override fun handlePlayerItemReservation(item: Item) {
         println("handlePlayerItemReservation")
-        TODO("Not yet implemented")
+        itemSelection.saved.add(item)
     }
 
     override fun handlePlayerUnreserveItem() {
         println("handlePlayerUnreserveItem")
-        TODO("Not yet implemented")
+        itemSelection.saved.clear()
     }
 
-
+    private lateinit var itemSelection: ItemSelection
     override fun getShopItems(): List<Item> {
         println("getting items")
-        var json = thread.getNextIncoming()
-        val itemSelection = gson.fromJson(json, ItemSelection::class.java)
+        itemSelection = gson.fromJson(thread.getNextIncoming(), ItemSelection::class.java)
         println("decoded: $itemSelection")
         return itemSelection.selection
     }

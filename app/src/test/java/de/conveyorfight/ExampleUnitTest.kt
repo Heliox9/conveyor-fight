@@ -40,7 +40,7 @@ class ExampleUnitTest {
                 gson.fromJson(
                     input.readLine(),
                     ItemSelection::class.java
-                )//TODO create custom json packing for itemTyp because java implementation does not match
+                )
             println("received:\n$selection")
 
             val bought: ArrayList<Item> = ArrayList()

@@ -7,24 +7,23 @@ import java.net.Socket
 import java.util.*
 
 class ClientThread : Thread() {
-    lateinit var socket: Socket
-    lateinit var output: PrintWriter
-    lateinit var input: BufferedReader
-    val incoming = LinkedList<String>()
-    val outgoing = LinkedList<String>()
+    private lateinit var socket: Socket
+    private lateinit var output: PrintWriter
+    private lateinit var input: BufferedReader
+    private val incoming = LinkedList<String>()
+    private val outgoing = LinkedList<String>()
 
     fun addOutgoing(out: String) {
         outgoing.push(out)
     }
 
     fun getNextIncoming(): String {
-        var polled: String = ""
 
         while (incoming.size == 0) {
-            Thread.sleep(100)
+            sleep(100)
         }
 
-        polled = incoming.poll()!!
+        val polled: String = incoming.poll()!!
         println("polled: $polled")
         println("values left: ${incoming.size}")
         println("list: $incoming")
@@ -33,12 +32,12 @@ class ClientThread : Thread() {
 
     }
 
-    fun sendToServer(s: String) {
+    private fun sendToServer(s: String) {
         println("sending: $s")
         output.println(s)
     }
 
-    fun readFromServer(): String {
+    private fun readFromServer(): String {
         val read = input.readLine()
         println("receiving: $read")
         return read
@@ -78,14 +77,13 @@ class ClientThread : Thread() {
         while (true) {
             appendIncoming(readFromServer())
             if (outgoing.size > 0) sendToServer(outgoing.pop())
-            //TODO complete
         }
     }
 
     private fun appendIncoming(inc: String) {
         println("attempting to add message to queue: $inc")
-        if (inc != null && !inc.equals("")) incoming.add(inc)
+        if (inc.isNotEmpty()) incoming.add(inc)
         println("message queue size: ${incoming.size}")
-        println("message queue: ${incoming}")
+        println("message queue: $incoming")
     }
 }
