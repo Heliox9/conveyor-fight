@@ -6,17 +6,20 @@ import android.graphics.BitmapFactory
 import de.conveyorfight.R
 import java.util.*
 
-class Item(val context: Context,
-           val round: Int,
-           var rarity: Int = -1,
-           var itemType:ItemTypes? = null,
-           var cost: Int = 5,
-           var properties: ArrayList<PropertyValue> = ArrayList<PropertyValue>()) {
+class Item(
+    val context: Context,
+    val round: Int,
+    var rarity: Int = -1,
+    var itemType: ItemTypes? = null,
+    var cost: Int = 5,
+    var properties: ArrayList<PropertyValue> = ArrayList<PropertyValue>(),
+    var uuid: UUID? = null
+) {
 
     lateinit var bitmap: Bitmap
 
     init {
-        if (properties.isEmpty()){
+        if (properties.isEmpty()) {
             createRandomItem()
         }
         createBitmap()
@@ -24,7 +27,7 @@ class Item(val context: Context,
 
     private fun createRandomItem() {
 
-        if(rarity == -1) {
+        if (rarity == -1) {
             rarity = when (round) {
                 1 -> 1
                 2 -> determineRarity(80, 100)
@@ -38,25 +41,30 @@ class Item(val context: Context,
             }
         }
 
-        if(itemType == null) {
+        if (itemType == null) {
             do {
                 itemType = ItemTypes.values()[Random().nextInt(ItemTypes.values().size)];
             } while ((itemType == ItemTypes.RangeNull && rarity > 1) ||
-                (itemType == ItemTypes.RangeTwo && rarity > 2))
+                (itemType == ItemTypes.RangeTwo && rarity > 2)
+            )
         }
 
-        if (itemType == ItemTypes.Special){
-            if(rarity == 1){
+        if (itemType == ItemTypes.Special) {
+            if (rarity == 1) {
                 properties.add(generateARandomProperty())
             }
-        } else { generateNonSpecialItem() }
+
+        } else {
+            generateNonSpecialItem()
+        }
     }
 
     private fun generateARandomProperty(): PropertyValue {
         val property: Properties =
             Properties.values()[Random().nextInt(Properties.values().size)]
         val rarityValue: RarityValue =
-            property.detail.rarities.find { value -> value.rarity == 2 } ?: return generateARandomProperty()
+            property.detail.rarities.find { value -> value.rarity == 2 }
+                ?: return generateARandomProperty()
         return PropertyValue(property, (rarityValue.minValue..rarityValue.maxValue).random())
     }
 
@@ -90,7 +98,7 @@ class Item(val context: Context,
                 numberProperties++
                 continue
             }
-            if (properties.find {rarityValueOwned -> rarityValueOwned.property == property} != null){
+            if (properties.find { rarityValueOwned -> rarityValueOwned.property == property } != null) {
                 numberProperties++
                 continue
             }
@@ -113,7 +121,7 @@ class Item(val context: Context,
     }
 
     fun createBitmap() {
-        bitmap = when(ItemTypeRarity(itemType!!, rarity)) {
+        bitmap = when (ItemTypeRarity(itemType!!, rarity)) {
             ItemTypeRarity(ItemTypes.Helmet, 1) ->
                 BitmapFactory.decodeResource(context.resources, R.drawable.leather_helm)
             ItemTypeRarity(ItemTypes.Helmet, 2) ->
@@ -162,20 +170,26 @@ class Item(val context: Context,
                 BitmapFactory.decodeResource(context.resources, R.drawable.axe)
             ItemTypeRarity(ItemTypes.RangeFour, 3) ->
                 BitmapFactory.decodeResource(context.resources, R.drawable.great_sword)
-            ItemTypeRarity(ItemTypes.RangeSix,1) ->
+            ItemTypeRarity(ItemTypes.RangeSix, 1) ->
                 BitmapFactory.decodeResource(context.resources, R.drawable.monkey_staff)
-            ItemTypeRarity(ItemTypes.RangeSix,2) ->
+            ItemTypeRarity(ItemTypes.RangeSix, 2) ->
                 BitmapFactory.decodeResource(context.resources, R.drawable.spear)
-            ItemTypeRarity(ItemTypes.RangeSix,3) ->
+            ItemTypeRarity(ItemTypes.RangeSix, 3) ->
                 BitmapFactory.decodeResource(context.resources, R.drawable.scythe)
             else -> return
         }
     }
 
     fun clone(): Item {
-        val item = Item(context, round, rarity, itemType, cost,
-            properties.clone() as ArrayList<PropertyValue>)
+        val item = Item(
+            context, round, rarity, itemType, cost,
+            properties.clone() as ArrayList<PropertyValue>, uuid
+        )
         item.createBitmap()
         return item
+    }
+
+    override fun toString(): String {
+        return "Item(uuid=$uuid, round=$round, rarity=$rarity, itemType=$itemType, cost=$cost, properties=$properties)"
     }
 }
