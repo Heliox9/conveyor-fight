@@ -55,11 +55,16 @@ class OnlineGameFragment : GeneralGameInterface() {
         TODO("Not yet implemented")
     }
 
-    override fun handlePlayerUnreserveItem(item: Item) {
+    override fun handlePlayerUnreserveItem() {
         TODO("Not yet implemented")
     }
 
+
     override fun getShopItems(): List<Item> {
+        TODO("Not yet implemented")
+    }
+
+    override fun handleRoundEnd() {
         TODO("Not yet implemented")
     }
 }
