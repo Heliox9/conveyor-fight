@@ -3,8 +3,14 @@ package de.conveyorfight.assets
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import com.google.gson.GsonBuilder
+import com.google.gson.JsonDeserializationContext
+import com.google.gson.JsonDeserializer
+import com.google.gson.JsonElement
 import de.conveyorfight.R
+import java.lang.reflect.Type
 import java.util.*
+import kotlin.collections.ArrayList
 
 class Item(
     val context: Context,
@@ -42,6 +48,7 @@ class Item(
         }
 
         if (itemType == null) {
+
             do {
                 itemType = ItemTypes.values()[Random().nextInt(ItemTypes.values().size)];
             } while ((itemType == ItemTypes.RangeNull && rarity > 1) ||
@@ -191,5 +198,46 @@ class Item(
 
     override fun toString(): String {
         return "Item(uuid=$uuid, round=$round, rarity=$rarity, itemType=$itemType, cost=$cost, properties=$properties)"
+    }
+
+    class Deserializer(private val globalContext: Context) : JsonDeserializer<Item> {
+
+        override fun deserialize(
+            json: JsonElement?,
+            typeOfT: Type?,
+            context: JsonDeserializationContext?
+        ): Item {
+            val jsonObject = json!!.asJsonObject
+            println("deserialization started")
+            println(jsonObject)
+
+
+            println(jsonObject.get("itemTyp").asString)
+            val typ = ItemTypes.valueOfCaseInsensitive(jsonObject.get("itemTyp").asString)
+            println(typ)
+
+            //TODO rangetyp
+
+            val gsonFac = GsonBuilder()
+            gsonFac.registerTypeAdapter(PropertyValue::class.java, PropertyValue.Deserializer())
+            val gson = gsonFac.create()
+
+            //props
+            val properties = ArrayList<PropertyValue>()
+            for (j: JsonElement in jsonObject.get("properties").asJsonArray.asIterable()) {
+                properties.add(gson.fromJson(j, PropertyValue::class.java))
+                println(properties.last())
+            }
+
+            return Item(
+                this.globalContext,
+                jsonObject.get("round").asInt,
+                jsonObject.get("rarity").asInt,
+                typ,
+                jsonObject.get("cost").asInt,
+                properties,
+                gson.fromJson(jsonObject.get("uuid"), UUID::class.java)
+            );
+        }
     }
 }

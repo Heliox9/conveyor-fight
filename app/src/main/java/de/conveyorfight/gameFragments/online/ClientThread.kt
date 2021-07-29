@@ -4,18 +4,44 @@ import java.io.BufferedReader
 import java.io.InputStreamReader
 import java.io.PrintWriter
 import java.net.Socket
+import java.util.*
 
 class ClientThread : Thread() {
     lateinit var socket: Socket
     lateinit var output: PrintWriter
     lateinit var input: BufferedReader
+    val incoming = LinkedList<String>()
+    val outgoing = LinkedList<String>()
 
-    public fun sendToServer(s: String) {
+    fun addOutgoing(out: String) {
+        outgoing.push(out)
+    }
+
+    fun getNextIncoming(): String {
+        var polled: String = ""
+
+        while (incoming.size == 0) {
+            Thread.sleep(100)
+        }
+
+        polled = incoming.poll()!!
+        println("polled: $polled")
+        println("values left: ${incoming.size}")
+        println("list: $incoming")
+        return polled
+
+
+    }
+
+    fun sendToServer(s: String) {
+        println("sending: $s")
         output.println(s)
     }
 
-    public fun readFromServer(): String {
-        return input.readLine()
+    fun readFromServer(): String {
+        val read = input.readLine()
+        println("receiving: $read")
+        return read
     }
 
     /**
@@ -39,12 +65,27 @@ class ClientThread : Thread() {
 
 
         // server handshake
-        sendToServer("App")
-        println("Game ID: " + readFromServer())
-        println("Opponent: " + readFromServer())
+        sendToServer("App")// sending name
+        readFromServer()// game id
+        readFromServer()//opponent
 
+        println("handshake complete starting iteration")
+        println("|")
+        println("|")
+        println("V")
+
+        // always up loop to send and receive messages
         while (true) {
-            // dummy
+            appendIncoming(readFromServer())
+            if (outgoing.size > 0) sendToServer(outgoing.pop())
+            //TODO complete
         }
+    }
+
+    private fun appendIncoming(inc: String) {
+        println("attempting to add message to queue: $inc")
+        if (inc != null && !inc.equals("")) incoming.add(inc)
+        println("message queue size: ${incoming.size}")
+        println("message queue: ${incoming}")
     }
 }

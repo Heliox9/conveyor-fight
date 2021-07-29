@@ -1,24 +1,26 @@
 package de.conveyorfight.assets
 
-import java.util.ArrayList
+import java.util.*
 import kotlin.math.min
 import kotlin.random.Random
 
-class Character(var hp: Int = 100,
-                var helmet: Item? =null,
-                var gloves: Item? =null,
-                var armor: Item? =null,
-                var pants: Item? =null,
-                var shoes: Item? =null,
-                var special: Item? =null,
-                var weapon: Item? =null,
-                var propertiesKnown: ArrayList<Properties> = ArrayList<Properties>()) {
+class Character(
+    var hp: Int = 100,
+    var helmet: Item? = null,
+    var gloves: Item? = null,
+    var armor: Item? = null,
+    var pants: Item? = null,
+    var shoes: Item? = null,
+    var special: Item? = null,
+    var weapon: Item? = null,
+    var propertiesKnown: ArrayList<Properties> = ArrayList<Properties>()
+) {
 
     //TODO visual (den dude muss ich ja auch zeichenen q.q)
     //TODO mergen mit Masterstand
 
-    fun add(item: Item){
-        when(item.itemType){
+    fun add(item: Item) {
+        when (item.itemType) {
             ItemTypes.Helmet -> helmet = item
             ItemTypes.Gloves -> gloves = item
             ItemTypes.Armor -> armor = item
@@ -32,24 +34,24 @@ class Character(var hp: Int = 100,
         }
     }
 
-    fun isFirst(enemyWeapon: Item?): Boolean{
+    fun isFirst(enemyWeapon: Item?): Boolean {
 
         val playerWeapon = weapon
-        if(enemyWeapon == null && playerWeapon == null){
+        if (enemyWeapon == null && playerWeapon == null) {
             return isFirstByLuck()
         }
-        if(enemyWeapon == null){
+        if (enemyWeapon == null) {
             return true
         }
-        if(playerWeapon == null){
+        if (playerWeapon == null) {
             return false
         }
 
         val enemyRange = enemyWeapon.itemType?.range
         val playerRange = playerWeapon.itemType?.range
 
-        if(enemyRange == playerRange){
-            if(enemyWeapon.rarity == playerWeapon.rarity){
+        if (enemyRange == playerRange) {
+            if (enemyWeapon.rarity == playerWeapon.rarity) {
                 return isFirstByLuck()
             }
             return playerWeapon.rarity > enemyWeapon.rarity
@@ -57,17 +59,17 @@ class Character(var hp: Int = 100,
         return playerRange!! > enemyRange!!
     }
 
-    private fun isFirstByLuck(): Boolean{
+    private fun isFirstByLuck(): Boolean {
         return Random.nextBoolean()
     }
 
-    fun getDamageDealt(): List<PropertyValue>{
+    fun getDamageDealt(): List<PropertyValue> {
         val itemList = listOf(helmet, gloves, armor, pants, shoes, special, weapon)
         val propertyDamage = ArrayList<PropertyValue>()
-        for (item in itemList){
-            if(item != null){
-                for (property in item.properties){
-                    if(property.property.detail.isDamage) {
+        for (item in itemList) {
+            if (item != null) {
+                for (property in item.properties) {
+                    if (property.property.detail.isDamage) {
                         val isAdded = propertyDamage.find { pd -> pd.property == property.property }
                         if (isAdded != null) {
                             isAdded.value += property.value
@@ -84,10 +86,10 @@ class Character(var hp: Int = 100,
     fun calculateDamageTaken(propertyDamages: List<PropertyValue>) {
         val itemList = listOf(helmet, gloves, armor, pants, shoes, special, weapon)
         val propertyArmor = ArrayList<PropertyValue>()
-        for (item in itemList){
-            if(item != null){
-                for (property in item.properties){
-                    if(!property.property.detail.isDamage) {
+        for (item in itemList) {
+            if (item != null) {
+                for (property in item.properties) {
+                    if (!property.property.detail.isDamage) {
                         val isAdded = propertyArmor.find { pd -> pd.property == property.property }
                         if (isAdded != null) {
                             isAdded.value += property.value
@@ -99,9 +101,9 @@ class Character(var hp: Int = 100,
             }
         }
         var damage = 0
-        for(propertyDamage in propertyDamages){
+        for (propertyDamage in propertyDamages) {
             val blockedBy = propertyDamage.property.detail.blockedBy
-            damage += if(blockedBy != null){
+            damage += if (blockedBy != null) {
                 val isAdded = propertyArmor.find { pd -> pd.property == blockedBy }
                 if (isAdded != null) {
                     min(0, propertyDamage.value - isAdded.value)
@@ -115,11 +117,11 @@ class Character(var hp: Int = 100,
         hp -= damage
     }
 
-    fun upgradeRandomItem(){
+    fun upgradeRandomItem() {
         val itemList = listOf(helmet, gloves, armor, pants, shoes, special, weapon)
         val probableItems = ArrayList<Item>()
-        for (item in itemList){
-            if(item != null && item.rarity < 3){
+        for (item in itemList) {
+            if (item != null && item.rarity < 3) {
                 probableItems.add(item)
             }
         }
@@ -129,8 +131,8 @@ class Character(var hp: Int = 100,
 
     fun isUpgradeAble(): Boolean {
         val itemList = listOf(helmet, gloves, armor, pants, shoes, special, weapon)
-        for (item in itemList){
-            if(item != null && item.rarity < 3){
+        for (item in itemList) {
+            if (item != null && item.rarity < 3) {
                 return true
             }
         }
@@ -138,8 +140,14 @@ class Character(var hp: Int = 100,
     }
 
     fun clone(): Character {
-        return Character(hp, helmet?.clone(), gloves?.clone(), armor?.clone(), pants?.clone(),
+        return Character(
+            hp, helmet?.clone(), gloves?.clone(), armor?.clone(), pants?.clone(),
             shoes?.clone(), special?.clone(), weapon?.clone(),
-            propertiesKnown.clone() as ArrayList<Properties>)
+            propertiesKnown.clone() as ArrayList<Properties>
+        )
+    }
+
+    override fun toString(): String {
+        return "Character(hp=$hp, helmet=$helmet, gloves=$gloves, armor=$armor, pants=$pants, shoes=$shoes, special=$special, weapon=$weapon, propertiesKnown=$propertiesKnown)"
     }
 }
