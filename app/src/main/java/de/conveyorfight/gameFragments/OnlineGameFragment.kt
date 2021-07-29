@@ -12,33 +12,36 @@ import de.conveyorfight.assets.PropertyValue
 import de.conveyorfight.gameFragments.online.ClientThread
 import de.conveyorfight.gameFragments.online.ItemSelection
 
+/**
+ * GameFragment implementation for online versus mode
+ */
 class OnlineGameFragment : GeneralGameInterface() {
-    private lateinit var gsonBuilder: GsonBuilder
+
     private lateinit var gson: Gson
     private lateinit var thread: ClientThread
 
     private lateinit var character: Character
     private var money: Int = -42
 
+    /**
+     * expanded view creation with boilerplate for gson and socket thread
+     */
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
         // setup gson to convert from/to json
-        gsonBuilder = GsonBuilder()
+        val gsonBuilder = GsonBuilder()
         gsonBuilder.registerTypeAdapter(Item::class.java, Item.Deserializer(requireContext()))
         gsonBuilder.registerTypeAdapter(PropertyValue::class.java, PropertyValue.Deserializer())
         gson = gsonBuilder.create()
-
-
 
         thread = ClientThread()
         thread.start()
 
         // wait for thread to initialize
         Thread.sleep(100)
-
 
         // after this point round iteration begins
 
@@ -61,6 +64,9 @@ class OnlineGameFragment : GeneralGameInterface() {
         TODO("Not yet implemented")
     }
 
+    /**
+     * read money individually from socket
+     */
     override fun getPlayerCoin(): Int {
         println("getter money called")
         money = gson.fromJson(thread.getNextIncoming(), Int::class.java)
@@ -87,6 +93,9 @@ class OnlineGameFragment : GeneralGameInterface() {
         TODO("Not yet implemented")
     }
 
+    /**
+     * read character sheet from socket
+     */
     override fun getPlayerItems(): Character {
         println("getPlayerItems")
         character = gson.fromJson(thread.getNextIncoming(), Character::class.java)
@@ -100,23 +109,36 @@ class OnlineGameFragment : GeneralGameInterface() {
         TODO("Not yet implemented")
     }
 
+    /**
+     * add item to buy list and send selection over socket
+     */
     override fun handlePlayerBuy(item: Item) {
         println("handlePlayerBuy")
         itemSelection.bought.add(item)
         thread.addOutgoing(gson.toJson(itemSelection))
     }
 
+    /**
+     * add item to saved list
+     */
     override fun handlePlayerItemReservation(item: Item) {
         println("handlePlayerItemReservation")
         itemSelection.saved.add(item)
     }
 
+    /**
+     * clear saved list
+     */
     override fun handlePlayerUnreserveItem() {
         println("handlePlayerUnreserveItem")
         itemSelection.saved.clear()
     }
 
     private lateinit var itemSelection: ItemSelection
+
+    /**
+     * read selection from socket
+     */
     override fun getShopItems(): List<Item> {
         println("getting items")
         itemSelection = gson.fromJson(thread.getNextIncoming(), ItemSelection::class.java)
