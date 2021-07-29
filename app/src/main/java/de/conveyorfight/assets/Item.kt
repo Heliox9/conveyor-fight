@@ -50,7 +50,7 @@ class Item(
         if (itemType == null) {
 
             do {
-                itemType = ItemTypes.values()[Random().nextInt(ItemTypes.values().size)];
+                itemType = ItemTypes.values()[Random().nextInt(ItemTypes.values().size)]
             } while ((itemType == ItemTypes.RangeNull && rarity > 1) ||
                 (itemType == ItemTypes.RangeTwo && rarity > 2)
             )
@@ -213,10 +213,20 @@ class Item(
 
 
             println(jsonObject.get("itemTyp").asString)
-            val typ = ItemTypes.valueOfCaseInsensitive(jsonObject.get("itemTyp").asString)
-            println(typ)
+            val typString = jsonObject.get("itemTyp").asString
+            var typ: ItemTypes = if (typString != "WEAPON") {
+                ItemTypes.valueOfCaseInsensitive(typString)!!
+            } else {
+                // range for weapons
+                when (val range = jsonObject.get("range").asInt) {
+                    0 -> ItemTypes.RangeNull
+                    2 -> ItemTypes.RangeTwo
+                    4 -> ItemTypes.RangeFour
+                    6 -> ItemTypes.RangeSix
+                    else -> throw IllegalArgumentException("$range is not a valid range value")
+                }
+            }
 
-            //TODO rangetyp
 
             val gsonFac = GsonBuilder()
             gsonFac.registerTypeAdapter(PropertyValue::class.java, PropertyValue.Deserializer())
