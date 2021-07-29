@@ -2,6 +2,9 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="de.conveyorfight">
 
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+
     <application
         android:name=".ConveyorApplication"
         android:allowBackup="true"
@@ -10,6 +13,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.ConveyorFight">
+
         <activity android:name=".gameFragments.AiGameFragment"></activity>
         <activity android:name=".MainActivity">
             <intent-filter>
