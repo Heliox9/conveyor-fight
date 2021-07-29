@@ -3,37 +3,61 @@ package de.conveyorfight.assets
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
-import android.graphics.Point
 import android.graphics.RectF
+import android.util.DisplayMetrics
 import de.conveyorfight.R
 import kotlin.math.roundToInt
 
-class Conveyor(context: Context, size: Point) {
-    var conveyor: Bitmap = BitmapFactory.decodeResource(
+class Conveyor(context: Context, size: DisplayMetrics) {
+    private var conveyorStill: Bitmap = BitmapFactory.decodeResource(
         context.resources,
         R.drawable.conveyor)
 
+    private var conveyorMoved: Bitmap = BitmapFactory.decodeResource(
+        context.resources,
+        R.drawable.conveyor2)
+
     val position: RectF
 
+    var isFirstPicture = true
+
     init {
-        val screenWidth: Double = size.x.toDouble()
-        val screenHeight: Double = size.y.toDouble()
-        val bitmapWidth: Double = conveyor.width.toDouble()
-        val bitmapHeight: Double = conveyor.height.toDouble()
+        val screenWidth: Double = size.widthPixels.toDouble()
+        val screenHeight: Double = size.heightPixels.toDouble()
+        val bitmapWidth: Double = conveyorStill.width.toDouble()
+        val bitmapHeight: Double = conveyorStill.height.toDouble()
 
-        val conveyorHeight =  screenHeight/ 4
-        val ratio = conveyorHeight/ bitmapHeight
-        val conveyorWidth = bitmapWidth * ratio
+        val conveyorHeight: Double
+        val conveyorWidth: Double
 
-        conveyor = Bitmap.createScaledBitmap(conveyor,
+        val heightRatio =  screenHeight/ (4*bitmapHeight)
+        val widthRatio = (screenWidth * 9) / (10 * bitmapWidth)
+        if( widthRatio > heightRatio ){
+            conveyorWidth = (screenWidth * 9) / 10
+            conveyorHeight = bitmapHeight * widthRatio
+        } else {
+            conveyorWidth =bitmapWidth * heightRatio
+            conveyorHeight = screenHeight / 4
+        }
+
+        conveyorStill = Bitmap.createScaledBitmap(conveyorStill,
+            conveyorWidth.roundToInt(),
+            conveyorHeight.roundToInt(),
+            false)
+
+        conveyorMoved = Bitmap.createScaledBitmap(conveyorMoved,
             conveyorWidth.roundToInt(),
             conveyorHeight.roundToInt(),
             false)
 
         position = RectF(
-            (screenWidth * 0.75 - conveyorWidth).toFloat(),
+            ((screenWidth - screenWidth/10) - conveyorWidth).toFloat(),
             (screenHeight - conveyorHeight).toFloat(),
-            (screenWidth * 0.75).toFloat(),
+            (screenWidth - screenWidth/10).toFloat(),
             screenHeight.toFloat())
+    }
+
+    fun getConveyor(): Bitmap {
+        return if(isFirstPicture) conveyorStill else conveyorMoved
     }
 }

@@ -2,47 +2,45 @@ package de.conveyorfight.fight
 
 import android.content.Context
 import android.graphics.*
+import android.util.DisplayMetrics
 import android.view.SurfaceView
 import de.conveyorfight.R
 import de.conveyorfight.assets.Character
-import de.conveyorfight.assets.Conveyor
-import de.conveyorfight.assets.GrapplingHook
 import kotlin.math.ceil
 
 // TODO: aus clonen companion objekte erstellen
 
-
 class FightView(
     context: Context,
-    playerFirst: Boolean,
-    playerItems: Character,
-    playerAfterDamage: Character,
-    enemyItems: Character,
-    enemyAfterDamage: Character,
-    kFunction0: () -> Unit,
-    kFunction01: () -> Unit
+    val isPlayerFirst: Boolean,
+    val playerCharacter: Character,
+    val playerCharacterAfterDamage: Character,
+    val enemyCharacter: Character,
+    val enemyCharacterAfterDamage: Character,
+    val initiateWin: () -> Unit,
+    val initiateLoose: () -> Unit
 ) : SurfaceView(context) {
 
     private var canvas: Canvas = Canvas()
     private val paint: Paint = Paint()
-    private val size = Point()
-    private val conveyor: Conveyor
-    private var hook: GrapplingHook
+    private val size = DisplayMetrics()
 
-    private var background: Bitmap = BitmapFactory.decodeResource(
+    var background: Bitmap = BitmapFactory.decodeResource(
         context.resources,
         R.drawable.background_fight)
 
     init {
-        display.getSize(size)
-        this.createBackgroundBitmap()
-        conveyor = Conveyor(context, size)
-        hook = GrapplingHook(context, size)
+        //TODO: richtige Metrics bekommen
+        display?.apply {
+            getRealMetrics(size)
+        }
+        getBackgroundBitmap()
     }
 
-    private fun createBackgroundBitmap () {
-        val screenWidth: Double = size.x.toDouble()
-        val screenHeight: Double = size.y.toDouble()
+
+    private fun getBackgroundBitmap () {
+        val screenWidth: Double = size.widthPixels.toDouble()
+        val screenHeight: Double = size.heightPixels.toDouble()
         val bitmapWidth: Double = background.width.toDouble()
         val bitmapHeight: Double = background.height.toDouble()
         val backgroundWidth: Int
@@ -59,6 +57,108 @@ class FightView(
         }
 
         background = Bitmap.createScaledBitmap(background, backgroundWidth, backgroundHeight, true)
+    }
 
+    fun drawScene() {
+        while (true){
+            if (!holder.surface.isValid){
+                continue
+            }
+
+            canvas = holder.lockCanvas()
+            canvas.drawBitmap(background, 0F, 0F, null)
+            drawCharacterAndItems(playerCharacter, true)
+            drawCharacterAndItems(enemyCharacter, false)
+            holder.unlockCanvasAndPost(canvas)
+
+            Thread.sleep(3000)
+
+            canvas = holder.lockCanvas()
+            canvas.drawBitmap(background, 0F, 0F, null)
+            drawCharacterAndItems(playerCharacter, true)
+            drawCharacterAndItems(enemyCharacter, false)
+            drawAttack(isPlayerFirst)
+            holder.unlockCanvasAndPost(canvas)
+
+            Thread.sleep(1000)
+
+            canvas = holder.lockCanvas()
+            canvas.drawBitmap(background, 0F, 0F, null)
+            drawCharacterAndItems(if(isPlayerFirst) playerCharacter else playerCharacterAfterDamage, true)
+            drawCharacterAndItems(if(isPlayerFirst) enemyCharacterAfterDamage else enemyCharacter, false)
+            holder.unlockCanvasAndPost(canvas)
+
+            Thread.sleep(3000)
+
+            if(enemyCharacter.hp <= 0 || playerCharacter.hp <= 0){
+                canvas = holder.lockCanvas()
+                canvas.drawBitmap(background, 0F, 0F, null)
+                drawCharacterAndItems(if(isPlayerFirst) playerCharacter else playerCharacterAfterDamage, true)
+                drawCharacterAndItems(if(isPlayerFirst) enemyCharacterAfterDamage else enemyCharacter, false)
+
+                if (isPlayerFirst){
+                    handleWin()
+                } else {
+                    handleLoose()
+                }
+                holder.unlockCanvasAndPost(canvas)
+                break
+            }
+
+            canvas = holder.lockCanvas()
+            canvas.drawBitmap(background, 0F, 0F, null)
+            drawCharacterAndItems(if(isPlayerFirst) playerCharacter else playerCharacterAfterDamage, true)
+            drawCharacterAndItems(if(isPlayerFirst) enemyCharacterAfterDamage else enemyCharacter, false)
+            drawAttack(!isPlayerFirst)
+            holder.unlockCanvasAndPost(canvas)
+
+            Thread.sleep(1000)
+
+            canvas = holder.lockCanvas()
+            canvas.drawBitmap(background, 0F, 0F, null)
+            drawCharacterAndItems(playerCharacterAfterDamage, true)
+            drawCharacterAndItems(enemyCharacterAfterDamage, false)
+            holder.unlockCanvasAndPost(canvas)
+
+            Thread.sleep(3000)
+
+            if(enemyCharacter.hp <= 0 || playerCharacter.hp <= 0){
+                canvas = holder.lockCanvas()
+                canvas.drawBitmap(background, 0F, 0F, null)
+                drawCharacterAndItems(if(isPlayerFirst) playerCharacter else playerCharacterAfterDamage, true)
+                drawCharacterAndItems(if(isPlayerFirst) enemyCharacterAfterDamage else enemyCharacter, false)
+
+                if (!isPlayerFirst){
+                    handleWin()
+                } else {
+                    handleLoose()
+                }
+                holder.unlockCanvasAndPost(canvas)
+            }
+            break
+        }
+    }
+
+    private fun drawCharacterAndItems(character: Character, isPlayer: Boolean){
+        //TODO
+    }
+
+    private fun drawAttack(isPlayer: Boolean) {
+        //TODO
+    }
+
+    private fun handleWin() {
+        //TODO
+    }
+
+    private fun handleLoose() {
+        //TODO
+    }
+
+    private fun createFlippedBitmap(source: Bitmap): Bitmap {
+        val matrix = Matrix()
+        matrix.postScale(-1f, 1f, source.width / 2f, source.height / 2f
+        )
+        return Bitmap.createBitmap(source, 0, 0, source.width, source.height, matrix, true)
     }
 }

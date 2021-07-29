@@ -155,9 +155,9 @@ class Item(
             ItemTypeRarity(ItemTypes.Special, 1) ->
                 BitmapFactory.decodeResource(context.resources, R.drawable.potion)
             ItemTypeRarity(ItemTypes.Special, 2) ->
-                BitmapFactory.decodeResource(context.resources, R.drawable.shield)
-            ItemTypeRarity(ItemTypes.Special, 3) ->
                 BitmapFactory.decodeResource(context.resources, R.drawable.magic_wand)
+            ItemTypeRarity(ItemTypes.Special, 3) ->
+                BitmapFactory.decodeResource(context.resources, R.drawable.shield)
             ItemTypeRarity(ItemTypes.RangeNull, 1) ->
                 BitmapFactory.decodeResource(context.resources, R.drawable.knuckle_duster)
             ItemTypeRarity(ItemTypes.RangeTwo, 1) ->
