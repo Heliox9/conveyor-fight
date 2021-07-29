@@ -49,6 +49,10 @@ class MenuFragment : Fragment() {
             NavHostFragment.findNavController(this)
                 .navigate(R.id.action_menuFragment_to_aiGameFragment)
         }
+        view.findViewById<Button>(R.id.menu_play_online_button).setOnClickListener {
+            NavHostFragment.findNavController(this)
+                .navigate(R.id.action_menuFragment_to_onlineGameFragment)
+        }
 
         // Volume bar visibility toggles
         view.findViewById<ImageButton>(R.id.effect_volume_btn).setOnClickListener {
