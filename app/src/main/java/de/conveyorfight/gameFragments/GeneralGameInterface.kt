@@ -1,52 +1,53 @@
 package de.conveyorfight.gameFragments
 
-//Todo: zauberstab und shield tauschen
 
 import android.os.Bundle
-import android.os.Handler
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import de.conveyorfight.assets.Character
 import de.conveyorfight.assets.Item
 import de.conveyorfight.fight.FightView
 import de.conveyorfight.shop.ShopView
 
-abstract class GeneralGameInterface: Runnable, Fragment(){
+abstract class GeneralGameInterface: Fragment(){
 
-    var round: Int = 0
+    var round: Int = 1
 
-    private val gameThread = Thread(this)
-
-    override fun onCreate(savedInstanceState: Bundle?) {
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
         super.onCreate(savedInstanceState)
-        gameThread.start()
+
+        return getShopView()
     }
 
-    override fun run() {
-        while (getPlayerHP() > 0 || getEnemyHP() > 0){
+    fun getShopView (): ShopView {
+        return ShopView(requireContext(),
+            getShopItems(),
+            getPlayerCoin(),
+            getPlayerItems(),
+            ::handlePlayerBuy,
+            ::handlePlayerItemReservation,
+            ::handlePlayerUnreserveItem)
+        //TODO: round iteration
+    }
 
-            ShopView(requireContext(),
-                getShopItems(),
-                getPlayerCoin(),
-                getPlayerItems(),
-                ::handlePlayerBuy,
-                ::handlePlayerItemReservation,
-                ::handlePlayerUnreserveItem)
-
-            //After 30 sec the FightView is called
-            val handler = Handler()
-            handler.postDelayed(Runnable {
-                FightView(requireContext(),
-                    isPlayerFirst(),
-                    getPlayerItems(),
-                    getPlayerAfterDamage(),
-                    getEnemyItems(),
-                    getEnemyAfterDamage(),
-                    ::handleWin,
-                    ::handleLoose
-                )
-            }, 30000)
-            round++
-        }
+    fun runFightView () {
+        FightView(requireContext(),
+            isPlayerFirst(),
+            getPlayerItems(),
+            getPlayerAfterDamage(),
+            getEnemyItems(),
+            getEnemyAfterDamage(),
+            ::handleWin,
+            ::handleLoose
+        )
+        round++
+        //TODO: loose/win sollten danach wieder auf menu verweisen
     }
 
     abstract fun getPlayerAfterDamage(): Character
@@ -73,7 +74,9 @@ abstract class GeneralGameInterface: Runnable, Fragment(){
 
     abstract fun handlePlayerItemReservation(item: Item)
 
-    abstract fun handlePlayerUnreserveItem(item: Item)
+    abstract fun handlePlayerUnreserveItem()
 
     abstract fun getShopItems(): List<Item>
+
+    abstract fun handleRoundEnd()
 }

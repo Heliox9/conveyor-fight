@@ -14,10 +14,16 @@ class AiGameFragment() : GeneralGameInterface() {
 
     var enemyCharacter = Character()
 
+
     override fun getShopItems(): List<Item> {
         val shopItems = ArrayList<Item>()
-        for (i in 5 downTo 0 step 1){
+        val numberOfItemsToGenerate = if (playerReservedItem == null) 4 else 3
+        for (i in numberOfItemsToGenerate downTo 0 step 1){
             shopItems.add(Item(requireContext(), this.round))
+        }
+        if (playerReservedItem != null){
+            shopItems.add(playerReservedItem!!)
+            playerReservedItem = null
         }
         return shopItems
     }
@@ -31,10 +37,10 @@ class AiGameFragment() : GeneralGameInterface() {
     }
 
     private fun calculateDamage(attacker: Character, attacked: Character): Character {
-        if (attacked.special != null && attacked.special!!.rarity == 2) {
+        if (attacked.special != null && attacked.special!!.rarity == 3) {
             return attacked
         }
-        if (attacker.special != null && attacker.special!!.rarity == 2) {
+        if (attacker.special != null && attacker.special!!.rarity == 3) {
             attacked.calculateDamageTaken(attacked.getDamageDealt())
             return attacked
         }
@@ -65,7 +71,7 @@ class AiGameFragment() : GeneralGameInterface() {
 
     override fun handlePlayerBuy(item: Item) {
         if (playerCoins < item.cost) return
-        if (item.itemType == ItemTypes.Special && item.rarity == 3) {
+        if (item.itemType == ItemTypes.Special && item.rarity == 2) {
             if(!playerCharacter.isUpgradeAble()) return
             playerCharacter.upgradeRandomItem()
         } else {
@@ -78,7 +84,7 @@ class AiGameFragment() : GeneralGameInterface() {
         playerReservedItem = item
     }
 
-    override fun handlePlayerUnreserveItem(item: Item) {
+    override fun handlePlayerUnreserveItem() {
         playerReservedItem = null
     }
 
@@ -88,6 +94,10 @@ class AiGameFragment() : GeneralGameInterface() {
 
     override fun getEnemyHP(): Int {
         return enemyCharacter.hp
+    }
+
+    override fun handleRoundEnd() {
+        playerCoins += 5
     }
 
     override fun handleWin() {
