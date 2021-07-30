@@ -1,5 +1,7 @@
 package de.conveyorfight.gameFragments
 
+import androidx.navigation.Navigation
+import de.conveyorfight.R
 import de.conveyorfight.assets.Character
 import de.conveyorfight.assets.Item
 import de.conveyorfight.assets.ItemTypes
@@ -96,6 +98,6 @@ class AiGameFragment() : GeneralGameInterface() {
     }
 
     override fun customHandleGameEnd() {
-        //for the ai there is nothing to do here
+        Navigation.findNavController(requireView()).navigate(R.id.action_aiGameFragment_to_menuFragment)
     }
 }

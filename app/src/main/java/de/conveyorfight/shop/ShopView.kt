@@ -10,7 +10,7 @@ import de.conveyorfight.assets.Character
 import de.conveyorfight.assets.Conveyor
 import de.conveyorfight.assets.GrapplingHook
 import de.conveyorfight.assets.Item
-import java.util.ArrayList
+import java.util.*
 import kotlin.math.ceil
 import kotlin.math.roundToInt
 import kotlin.reflect.KFunction0
@@ -18,10 +18,9 @@ import kotlin.reflect.KFunction1
 
 
 //TODO: change button colors, background of music stuff
-//TODO: conveyor unterschiedlich breit, dadurch wiggelt das so weird.
-//TODO: Buttons designen...
-//TODO: buttons gegebenenfalls disablen
-//TODO: Greifhaken geht zu weit runter
+//TODO: FightView refactoren
+//TODO: item verschwindet sofort, wenn man auf Kaufen klickt
+//TODO: Loose GIF & Win Gif
 class ShopView(
     context: Context,
     val shopItems: List<Item>,
@@ -49,8 +48,18 @@ class ShopView(
         R.drawable.background_wall
     )
 
+    private var arrow: Bitmap = BitmapFactory.decodeResource(
+        context.resources,
+        R.drawable.arrow
+    )
 
-    private lateinit  var firstItemCurrentPosition: RectF
+    private var buttonBackground: Bitmap = BitmapFactory.decodeResource(
+        context.resources,
+        R.drawable.button_background
+    )
+
+
+    private lateinit var firstItemCurrentPosition: RectF
     private lateinit var firstItemEndPosition: RectF
     private var itemInSpeed = 250f
     private val itemsBoughtIndexList = ArrayList<Int>()
@@ -62,10 +71,9 @@ class ShopView(
         gameThread.start()
     }
 
-    private fun init () {
+    private fun init() {
         display?.apply {
             getRealMetrics(size)
-            println("s")
         }
         size.heightPixels = 1080
         size.widthPixels = 2220
@@ -90,29 +98,46 @@ class ShopView(
             firstItemEndPosition.right - (screenWidth),
             firstItemEndPosition.bottom
         )
+
+        val arrowSize = screenWidth / 20
+        arrow = Bitmap.createScaledBitmap(
+            arrow, arrowSize.roundToInt(),
+            arrowSize.roundToInt(), false
+        )
+
         leftArrowPosition = RectF(
             screenWidth / 20,
             screenHeight / 40,
-            screenWidth / 20 + screenWidth / 7,
-            screenHeight / 15
+            screenWidth / 20 + arrowSize,
+            screenHeight / 40 + arrowSize
         )
         rightArrowPosition = RectF(
-            screenWidth - (screenWidth / 20 + screenWidth / 7),
-            screenHeight / 40,
-            screenWidth - screenWidth / 20,
-            screenHeight / 15
+            screenWidth - leftArrowPosition.right,
+            leftArrowPosition.top,
+            screenWidth - leftArrowPosition.left,
+            leftArrowPosition.bottom,
         )
+
+        val buttonLength = screenWidth / 6
+        val widthRatio = buttonLength / buttonBackground.width.toFloat()
+        val buttonHeight = buttonBackground.height * widthRatio
+
+        buttonBackground = Bitmap.createScaledBitmap(
+            buttonBackground,
+            buttonLength.roundToInt(), buttonHeight.roundToInt(), false
+        )
+
         buyButton = RectF(
             screenWidth / 8,
-            screenHeight * 35 / 40,
-            screenWidth * 3 / 8,
-            screenHeight * 39 / 40
+            screenHeight - (screenHeight / 40 + buttonHeight),
+            screenWidth / 8 + buttonLength,
+            screenHeight - screenHeight / 40
         )
         reserveButton = RectF(
-            screenWidth * 5 / 8,
-            screenHeight * 35 / 40,
-            screenWidth * 7 / 8,
-            screenHeight * 39 / 40
+            screenWidth - buyButton.right,
+            buyButton.top,
+            screenWidth - buyButton.left,
+            buyButton.bottom
         )
         didDisplayLoad = true
     }
@@ -124,21 +149,18 @@ class ShopView(
         while (true) {
             val startFrameTime = System.currentTimeMillis()
 
-
             if (holder.surface.isValid) {
-                println("isValid")
-                if(display != null && !didDisplayLoad){
-                    println("displayLoad")
+                if (display != null && !didDisplayLoad) {
                     init()
                 }
-                if(didDisplayLoad) {
-                    if(firstItemCurrentPosition.left < firstItemEndPosition.left){
-                        if ((startFrameTime - lastConveyorChange) > 1000){
+                if (didDisplayLoad) {
+                    if (firstItemCurrentPosition.left < firstItemEndPosition.left) {
+                        if ((startFrameTime - lastConveyorChange) > 1000) {
                             conveyor.isFirstPicture = !conveyor.isFirstPicture
                             lastConveyorChange = startFrameTime
                         }
                     }
-                    println("draw")
+
                     update(fps)
                     draw()
                 }
@@ -150,7 +172,6 @@ class ShopView(
             }
 
             if (System.currentTimeMillis() - startTime >= 29000) {
-                println("times over")
                 handleShopFinished()
                 break
             }
@@ -176,15 +197,19 @@ class ShopView(
         canvas = holder.lockCanvas()
 
         canvas.drawBitmap(background, 0F, 0F, null)
-        canvas.drawBitmap(hook.currentHook, null, hook.currentPosition, null)
         canvas.drawBitmap(conveyor.getConveyor(), null, conveyor.position, null)
 
         val screenHeight: Float = size.heightPixels.toFloat()
-        val textSize = screenHeight / 20
+        val textSize = screenHeight / 25
         paint.textSize = textSize
 
         drawItems(textSize)
         drawCoins(textSize)
+        canvas.drawBitmap(
+            hook.currentHook,
+            hook.currentPosition.left,
+            hook.currentPosition.bottom - hook.currentHook.height, null
+        )
 
         if (hook.currentPosition == hook.endPosition) {
             drawButtons(textSize)
@@ -199,25 +224,42 @@ class ShopView(
 
         paint.color = Color.argb(255, 240, 0, 0)
 
-        //left Arrow Dringed ersetzen durch gemalte Pfeile!
-        if (hook.currentPosition.left > screenWidth / 20) {
-            canvas.drawRect(leftArrowPosition, paint)
+        val isHookDown = hook.endPosition.bottom > screenHeight / 2
+        //left Arrow
+        if (hook.currentPosition.left > screenWidth / 20 && !isHookDown) {
+            canvas.drawBitmap(arrow, null, leftArrowPosition, null)
         }
 
         //rightArrow
-        if (hook.currentPosition.right < screenWidth - screenWidth / 20) {
-            canvas.drawRect(rightArrowPosition, paint)
+        if (hook.currentPosition.right < screenWidth - screenWidth / 20 && !isHookDown) {
+            canvas.drawBitmap(createFlippedBitmap(arrow), null, rightArrowPosition, null)
         }
 
-        canvas.drawRect(buyButton, paint)
-        paint.color = Color.argb(255, 255, 255, 255)
-        canvas.drawText("Buy", buyButton.left + 10, buyButton.bottom - textSize / 2, paint)
+        val itemIndex: Int =
+            (((hook.currentPosition.left.toDouble() - screenWidth / 20) / (screenWidth / 5)).roundToInt())
+        val isItemBought = itemsBoughtIndexList.contains(itemIndex)
+        val isItemAffordable = shopItems[itemIndex].cost <= playerCoin
 
-        paint.color = Color.argb(255, 255, 0, 0)
-        canvas.drawRect(reserveButton, paint)
-        paint.color = Color.argb(255, 255, 255, 255)
-        val text = if (hook.endPosition.bottom > screenHeight / 2) "Unreserve" else "Reserve"
-        canvas.drawText(text, reserveButton.left + 10, reserveButton.bottom - textSize / 2, paint)
+        val whiteTextPaint = Paint()
+        whiteTextPaint.color = Color.argb(255, 255, 255, 255)
+        whiteTextPaint.textAlign = Paint.Align.CENTER
+        whiteTextPaint.textSize = textSize
+        //BuyButton
+        if (!isHookDown && !isItemBought && isItemAffordable) {
+            canvas.drawBitmap(buttonBackground, null, buyButton, null)
+            val x = buyButton.left + (buyButton.right - buyButton.left) / 2
+            val y = buyButton.top + (buyButton.bottom - buyButton.top) / 2
+            canvas.drawText("Buy", x, y, whiteTextPaint)
+        }
+
+        //ReserveButton
+        if (!isItemBought) {
+            canvas.drawBitmap(buttonBackground, null, reserveButton, null)
+            val x = reserveButton.left + (reserveButton.right - reserveButton.left) / 2
+            val y = reserveButton.top + (reserveButton.bottom - reserveButton.top) / 2
+            val text = if (isHookDown) "Unreserve" else "Reserve"
+            canvas.drawText(text, x, y, whiteTextPaint)
+        }
     }
 
     private fun drawCoins(textSize: Float) {
@@ -225,14 +267,15 @@ class ShopView(
         val screenWidth = size.widthPixels.toFloat()
         val screenHalf = screenWidth / 2
 
-        val ovalPosition = RectF (
-            screenHalf - (screenWidth/40),
+        val ovalPosition = RectF(
+            screenHalf - (screenWidth / 40),
             (screenHeight - (textSize * 3.5)).toFloat(),
-            screenHalf + (screenWidth/40),
-            (screenHeight - (textSize * 0.5)).toFloat())
+            screenHalf + (screenWidth / 40),
+            (screenHeight - (textSize * 0.5)).toFloat()
+        )
 
         paint.color = Color.argb(255, 255, 140, 0)
-        canvas.drawOval( ovalPosition, paint)
+        canvas.drawOval(ovalPosition, paint)
 
         val textPaint = Paint()
         textPaint.textAlign = Paint.Align.CENTER
@@ -272,7 +315,13 @@ class ShopView(
                 while (j < currentItem.properties.size) {
                     val currentProperty = currentItem.properties[j]
                     val text = if (player.propertiesKnown.contains(currentProperty.property)) {
-                        "${currentProperty.property}: ${currentProperty.value}"
+                        "${
+                            currentProperty.property.name
+                                .replace("_", " ")
+                                .lowercase(Locale.getDefault())
+                                .replaceFirstChar { it.uppercase() }
+                        }: " +
+                                "${currentProperty.value}"
                     } else {
                         "???"
                     }
@@ -313,20 +362,18 @@ class ShopView(
             backgroundWidth = ceil(bitmapWidth * heightRatio).toInt()
             backgroundHeight = screenHeight.toInt()
         }
-        println(backgroundHeight)
-        println(backgroundWidth)
 
         background = Bitmap.createScaledBitmap(background, backgroundWidth, backgroundHeight, true)
     }
 
     private fun handleBuy() {
+        val screenWidth = size.widthPixels
         hook.endPosition = RectF(
             hook.currentPosition.left,
-            firstItemEndPosition.bottom - hook.hook.height,
+            firstItemEndPosition.bottom - (hook.hook.height + screenWidth / 25),
             hook.currentPosition.right,
-            firstItemEndPosition.bottom
+            firstItemEndPosition.bottom - screenWidth / 25
         )
-        val screenWidth = size.widthPixels.toDouble()
         val itemIndex =
             ((hook.currentPosition.left.toDouble() - screenWidth / 20) / (screenWidth / 5))
         hook.shouldBounce = true
@@ -336,14 +383,14 @@ class ShopView(
     }
 
     private fun handleReserve() {
+        val screenWidth = size.widthPixels
         hook.endPosition = RectF(
             hook.currentPosition.left,
-            firstItemEndPosition.bottom - hook.hook.height,
+            firstItemEndPosition.bottom - (hook.hook.height + screenWidth / 25),
             hook.currentPosition.right,
-            firstItemEndPosition.bottom
+            firstItemEndPosition.bottom - screenWidth / 25
         )
-        val screenWidth = size.widthPixels
-        val itemIndex = ((hook.currentPosition.left - screenWidth/20) / (screenWidth/5))
+        val itemIndex = ((hook.currentPosition.left - screenWidth / 20) / (screenWidth / 5))
         handlePlayerItemReservation(shopItems[itemIndex.roundToInt()])
     }
 
@@ -422,5 +469,13 @@ class ShopView(
             }
         }
         return false
+    }
+
+    private fun createFlippedBitmap(source: Bitmap): Bitmap {
+        val matrix = Matrix()
+        matrix.postScale(
+            -1f, 1f, source.width / 2f, source.height / 2f
+        )
+        return Bitmap.createBitmap(source, 0, 0, source.width, source.height, matrix, true)
     }
 }

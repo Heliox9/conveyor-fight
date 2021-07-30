@@ -119,7 +119,10 @@ class OnlineGameFragment : GeneralGameInterface() {
             return stateBeforeDamage!!.player
         }
 
-        character = gson.fromJson(thread?.getNextIncoming(), Character::class.java)
+        println("attempting to read player character")
+        val message = thread?.getNextIncoming()
+        println(message)
+        character = gson.fromJson(message, Character::class.java)
         println("player : $character")
         return character
     }

@@ -6,7 +6,7 @@ import com.google.gson.JsonDeserializationContext
 import com.google.gson.JsonDeserializer
 import com.google.gson.JsonElement
 import java.lang.reflect.Type
-import kotlin.math.min
+import java.util.*
 import kotlin.random.Random
 
 class Character(
@@ -19,7 +19,7 @@ class Character(
     var special: Item? = null,
     var weapon: Item? = null,
     var propertiesKnown: ArrayList<Properties> = ArrayList<Properties>()
-) {
+) : Cloneable {
 
     fun add(item: Item) {
         when (item.itemType) {
@@ -128,7 +128,13 @@ class Character(
             }
         }
         val itemToUpgrade = probableItems.random()
-        add(Item(itemToUpgrade.getContext(), itemToUpgrade.round, (itemToUpgrade.rarity + 1)))
+        add(
+            Item(
+                itemToUpgrade.getContext(),
+                itemToUpgrade.round,
+                rarity = (itemToUpgrade.rarity + 1)
+            )
+        )
     }
 
     fun isUpgradeAble(): Boolean {
@@ -141,7 +147,7 @@ class Character(
         return false
     }
 
-    fun clone(): Character {
+    public override fun clone(): Character {
         return Character(
             hp, helmet?.clone(), gloves?.clone(), armor?.clone(), pants?.clone(),
             shoes?.clone(), special?.clone(), weapon?.clone(),
@@ -154,7 +160,7 @@ class Character(
     }
 
 
-    public class Deserializer(private val globalContext: Context) : JsonDeserializer<Character> {
+    class Deserializer(private val globalContext: Context) : JsonDeserializer<Character> {
 
         override fun deserialize(
             json: JsonElement?,
