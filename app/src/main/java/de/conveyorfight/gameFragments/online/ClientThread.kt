@@ -6,7 +6,7 @@ import java.io.PrintWriter
 import java.net.Socket
 import java.util.*
 
-class ClientThread(val userName: String) : Thread() {
+class ClientThread(val userName: String, val ip: String, val port: Int) : Thread() {
     private lateinit var socket: Socket
     private lateinit var input: BufferedReader
     private val incoming = LinkedList<String>()
@@ -66,7 +66,10 @@ class ClientThread(val userName: String) : Thread() {
      */
     override fun run() {
         // socket creation
-        socket = Socket("192.168.178.233", 88)// TODO change/ make configurable
+        println("IP: $ip")
+        println("Port: $port")
+
+        socket = Socket(ip, port)// TODO change/ make configurable
         val output = PrintWriter(socket.getOutputStream(), true)
         input = BufferedReader(InputStreamReader(socket.getInputStream()))
 

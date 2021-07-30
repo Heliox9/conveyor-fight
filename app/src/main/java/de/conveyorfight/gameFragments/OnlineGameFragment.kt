@@ -6,6 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
+import de.conveyorfight.R
 import de.conveyorfight.assets.Character
 import de.conveyorfight.assets.Item
 import de.conveyorfight.assets.PropertyValue
@@ -52,7 +53,7 @@ class OnlineGameFragment : GeneralGameInterface() {
 
         gson = gsonBuilder.create()
 
-        thread = ClientThread(name)
+        thread = ClientThread(name, getString(R.string.ip), getString(R.string.port).toInt())
         thread!!.start()
 
         // wait for thread to initialize
