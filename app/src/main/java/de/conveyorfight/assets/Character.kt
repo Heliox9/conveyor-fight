@@ -1,5 +1,8 @@
 package de.conveyorfight.assets
 
+import android.content.Context
+import android.graphics.BitmapFactory
+import de.conveyorfight.R
 import java.util.ArrayList
 import kotlin.math.min
 import kotlin.random.Random
@@ -13,9 +16,6 @@ class Character(var hp: Int = 100,
                 var special: Item? =null,
                 var weapon: Item? =null,
                 var propertiesKnown: ArrayList<Properties> = ArrayList<Properties>()) {
-
-    //TODO visual (den dude muss ich ja auch zeichenen q.q)
-    //TODO mergen mit Masterstand
 
     fun add(item: Item){
         when(item.itemType){

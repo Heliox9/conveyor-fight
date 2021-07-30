@@ -5,7 +5,6 @@ import de.conveyorfight.assets.Item
 import de.conveyorfight.assets.ItemTypes
 import java.util.*
 
-
 class AiGameFragment() : GeneralGameInterface() {
 
     var playerCoins = 5
@@ -101,10 +100,14 @@ class AiGameFragment() : GeneralGameInterface() {
     }
 
     override fun handleWin() {
-        TODO("Not yet implemented")
+        //for the ai there is nothing to do here
     }
 
     override fun handleLoose() {
-        TODO("Not yet implemented")
+        //for the ai there is nothing to do here
+    }
+
+    override fun customHandleGameEnd() {
+        //for the ai there is nothing to do here
     }
 }

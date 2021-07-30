@@ -9,6 +9,7 @@ import android.util.DisplayMetrics
 import de.conveyorfight.R
 import kotlin.math.roundToInt
 
+//TODO: Kette zu kurz
 class GrapplingHook(context: Context, private val size: DisplayMetrics) {
     var hook: Bitmap = BitmapFactory.decodeResource(
         context.resources,
@@ -26,7 +27,7 @@ class GrapplingHook(context: Context, private val size: DisplayMetrics) {
 
     var shouldBounce = false
 
-    private val speed = 100F
+    private val speed = 200F
 
     init {
         val screenWidth: Double = size.widthPixels.toDouble()
@@ -55,6 +56,7 @@ class GrapplingHook(context: Context, private val size: DisplayMetrics) {
             ((screenHeight/ 4) - hookHeight).toFloat(),
             ((screenWidth/20)+hookWidth).toFloat(),
             (screenHeight/ 4).toFloat())
+        println("item:" + (screenWidth/20).toFloat())
 
         endPosition = currentPosition
     }
@@ -75,11 +77,6 @@ class GrapplingHook(context: Context, private val size: DisplayMetrics) {
                 currentPosition.top = minOf(endPosition.top, (currentPosition.top + speed/fps))
                 currentPosition.bottom = minOf(endPosition.bottom, (currentPosition.bottom + speed/fps))
                 if(currentHook != hook) currentHook = hook
-            }
-            currentPosition.top - endPosition.top > 0 -> {
-                currentPosition.top = maxOf(endPosition.top, (currentPosition.top - speed/fps))
-                currentPosition.bottom = maxOf(endPosition.bottom, (currentPosition.bottom - speed/fps))
-                if(currentHook != hook) currentHook = hook
                 if(currentPosition == endPosition && shouldBounce) run {
                     endPosition = RectF(
                         currentPosition.left,
@@ -89,6 +86,11 @@ class GrapplingHook(context: Context, private val size: DisplayMetrics) {
                     )
                     shouldBounce = false
                 }
+            }
+            currentPosition.top - endPosition.top > 0 -> {
+                currentPosition.top = maxOf(endPosition.top, (currentPosition.top - speed/fps))
+                currentPosition.bottom = maxOf(endPosition.bottom, (currentPosition.bottom - speed/fps))
+                if(currentHook != hook) currentHook = hook
             }
         }
     }
