@@ -38,9 +38,17 @@ class OnlineGameFragment : GeneralGameInterface() {
     ): View? {
         // setup gson to convert from/to json
         val gsonBuilder = GsonBuilder()
+        gsonBuilder.registerTypeAdapter(
+            Character::class.java,
+            Character.Deserializer(requireContext())
+        )
         gsonBuilder.registerTypeAdapter(Item::class.java, Item.Deserializer(requireContext()))
         gsonBuilder.registerTypeAdapter(Item::class.java, Item.Serializer())
         gsonBuilder.registerTypeAdapter(PropertyValue::class.java, PropertyValue.Deserializer())
+        gsonBuilder.registerTypeAdapter(
+            de.conveyorfight.assets.Properties::class.java,
+            de.conveyorfight.assets.Properties.Deserializer()
+        )
 
         gson = gsonBuilder.create()
 
@@ -110,7 +118,7 @@ class OnlineGameFragment : GeneralGameInterface() {
         }
 
         character = gson.fromJson(thread.getNextIncoming(), Character::class.java)
-        println("player: $character")
+        println("player : $character")
         return character
     }
 

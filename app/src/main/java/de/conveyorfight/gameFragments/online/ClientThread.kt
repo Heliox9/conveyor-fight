@@ -85,9 +85,9 @@ class ClientThread(val userName: String) : Thread() {
      * push incoming message to queue if its not empty
      */
     private fun appendIncoming(inc: String) {
-        println("attempting to add message to queue: $inc")
+//        println("attempting to add message to queue: $inc")
         if (inc.isNotEmpty()) incoming.add(inc)
-        println("message queue size: ${incoming.size}")
-        println("message queue: $incoming")
+//        println("message queue size: ${incoming.size}")
+//        println("message queue: $incoming")
     }
 }

@@ -1,5 +1,6 @@
 package de.conveyorfight.assets
 
+import com.google.gson.GsonBuilder
 import com.google.gson.JsonDeserializationContext
 import com.google.gson.JsonDeserializer
 import com.google.gson.JsonElement
@@ -16,18 +17,15 @@ data class PropertyValue(val property: Properties, var value: Int) {
             val jsonObject = json!!.asJsonObject
             println(json)
 
-            var element = jsonObject.get("element").asString
-            element = element.substring(0, 1) + element.substring(1)
-                .lowercase() + "_" + (if (jsonObject.get("typ").asBoolean) "Damage" else "Armor")
-            println(element)
+            val builder = GsonBuilder()
+            builder.registerTypeAdapter(Properties::class.java, Properties.Deserializer())
+            val gson = builder.create()
 
-            var propertie: Properties = Properties.valueOf(element)
-            println(propertie)
 
-            println("stat: ${jsonObject.get("stat")}")
-
-            return PropertyValue(propertie, jsonObject.get("stat").asInt)
-            TODO("Not yet implemented")
+            return PropertyValue(
+                gson.fromJson(jsonObject, Properties::class.java),
+                jsonObject.get("stat").asInt
+            )
         }
     }
 }

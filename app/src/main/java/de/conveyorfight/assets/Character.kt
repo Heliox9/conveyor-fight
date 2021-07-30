@@ -1,6 +1,11 @@
 package de.conveyorfight.assets
 
-import java.util.*
+import android.content.Context
+import com.google.gson.GsonBuilder
+import com.google.gson.JsonDeserializationContext
+import com.google.gson.JsonDeserializer
+import com.google.gson.JsonElement
+import java.lang.reflect.Type
 import kotlin.math.min
 import kotlin.random.Random
 
@@ -145,6 +150,48 @@ class Character(
     }
 
     override fun toString(): String {
-        return "Character(hp=$hp, helmet=$helmet, gloves=$gloves, armor=$armor, pants=$pants, shoes=$shoes, special=$special, weapon=$weapon, propertiesKnown=$propertiesKnown)"
+        return "Character(hp=$hp,propertiesKnown=$propertiesKnown,\n helmet=$helmet, gloves=$gloves, armor=$armor, pants=$pants, shoes=$shoes, special=$special, weapon=$weapon, )"
+    }
+
+
+    public class Deserializer(private val globalContext: Context) : JsonDeserializer<Character> {
+
+        override fun deserialize(
+            json: JsonElement?,
+            typeOfT: Type?,
+            context: JsonDeserializationContext?
+        ): Character {
+            val jsonObject = json!!.asJsonObject
+            println("---------------------------------------------------------------------")
+            println(jsonObject)
+
+            val builder = GsonBuilder()
+            builder.registerTypeAdapter(Properties::class.java, Properties.Deserializer())
+            builder.registerTypeAdapter(PropertyValue::class.java, PropertyValue.Deserializer())
+            builder.registerTypeAdapter(Item::class.java, Item.Deserializer(globalContext))
+            val gson = builder.create()
+
+            val viewableText = jsonObject.get("viewable")
+            val propertiesKnown = ArrayList<Properties>()
+            for (view in viewableText.asJsonArray) {
+
+                propertiesKnown.add(gson.fromJson(view, Properties::class.java))
+            }
+
+            val helmet = gson.fromJson(jsonObject.get("helmet"), Item::class.java)
+            val armor = gson.fromJson(jsonObject.get("armor"), Item::class.java)
+            val gloves = gson.fromJson(jsonObject.get("gloves"), Item::class.java)
+            val pants = gson.fromJson(jsonObject.get("pants"), Item::class.java)
+            val shoes = gson.fromJson(jsonObject.get("shoes"), Item::class.java)
+            val special = gson.fromJson(jsonObject.get("special"), Item::class.java)
+            val weapon = gson.fromJson(jsonObject.get("weapon"), Item::class.java)
+
+
+            return Character(
+                jsonObject.get("hp").asInt, helmet, gloves, armor, pants, shoes, special, weapon,
+                propertiesKnown = propertiesKnown
+            )
+        }
+
     }
 }
