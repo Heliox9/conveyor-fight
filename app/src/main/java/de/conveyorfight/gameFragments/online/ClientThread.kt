@@ -58,10 +58,10 @@ class ClientThread(private val userName: String, private val ip: String, private
      * gracefully shutdown all resources including the output thread
      */
     fun shutdown() {
+        continueRunning = false
         outThread.shutdown()
         input.close()
         incoming.clear()
-        continueRunning = false
 
     }
 

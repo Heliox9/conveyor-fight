@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.navigation.Navigation
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import de.conveyorfight.R
@@ -81,6 +82,9 @@ class OnlineGameFragment : GeneralGameInterface() {
         println("custom game end")
         thread!!.shutdown()
         thread = null
+
+        Navigation.findNavController(requireView())
+            .navigate(R.id.action_onlineGameFragment_to_menuFragment)
     }
 
 

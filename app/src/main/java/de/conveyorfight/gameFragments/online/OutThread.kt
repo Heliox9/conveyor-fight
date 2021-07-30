@@ -9,9 +9,9 @@ class OutThread(private val writer: PrintWriter) : Thread() {
     private var continueRunning = true
 
     fun shutdown() {
+        continueRunning = false
         outgoing.clear()
         writer.close()
-        continueRunning = false
     }
 
     /**
