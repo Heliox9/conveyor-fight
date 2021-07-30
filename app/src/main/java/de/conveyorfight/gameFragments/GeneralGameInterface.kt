@@ -17,7 +17,7 @@ import java.util.*
 import kotlin.concurrent.timerTask
 
 
-abstract class GeneralGameInterface: Fragment(){
+abstract class GeneralGameInterface : Fragment() {
 
     var round: Int = 1
     var switcher: ViewAnimator? = null
@@ -38,7 +38,7 @@ abstract class GeneralGameInterface: Fragment(){
     }
 
     private fun switchView() {
-        if(isShopView) {
+        if (isShopView) {
             val fightView = getFightView()
             switcher!!.removeAllViews()
             switcher!!.addView(fightView)
@@ -62,7 +62,7 @@ abstract class GeneralGameInterface: Fragment(){
         }, delay)
     }
 
-    private fun getShopView (): ShopView {
+    private fun getShopView(): ShopView {
         return ShopView(
             requireContext(),
             getShopItems(),
@@ -71,10 +71,11 @@ abstract class GeneralGameInterface: Fragment(){
             ::handlePlayerBuy,
             ::handlePlayerItemReservation,
             ::handlePlayerUnreserveItem,
+            ::handleShopFinished,
         )
     }
 
-    private fun getFightView (): FightView {
+    private fun getFightView(): FightView {
         round++
         return FightView(
             requireContext(),
@@ -93,7 +94,9 @@ abstract class GeneralGameInterface: Fragment(){
         customHandleGameEnd()
     }
 
-    abstract fun customHandleGameEnd ()
+    abstract fun handleShopFinished()
+
+    abstract fun customHandleGameEnd()
 
     abstract fun getPlayerAfterDamage(): Character
 

@@ -13,6 +13,9 @@
         <action
             android:id="@+id/action_menuFragment_to_aiGameFragment"
             app:destination="@id/aiGameFragment" />
+        <action
+            android:id="@+id/action_menuFragment_to_onlineGameFragment"
+            app:destination="@id/onlineGameFragment" />
     </fragment>
     <fragment
         android:id="@+id/aiGameFragment"
@@ -20,6 +23,14 @@
         android:label="fragment_ai_game">
         <action
             android:id="@+id/action_aiGameFragment_to_menuFragment"
+            app:destination="@id/menuFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/onlineGameFragment"
+        android:name="de.conveyorfight.gameFragments.OnlineGameFragment"
+        android:label="OnlineGameFragment" >
+        <action
+            android:id="@+id/action_onlineGameFragment_to_menuFragment"
             app:destination="@id/menuFragment" />
     </fragment>
 </navigation>

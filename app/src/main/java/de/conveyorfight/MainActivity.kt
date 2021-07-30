@@ -18,11 +18,8 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        // set landscape view
-        // TODO enable inverse landscape functionality
         requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
 
-        // TODO save volume levels between startups
     }
 
     // save current track do disable changing to same track
