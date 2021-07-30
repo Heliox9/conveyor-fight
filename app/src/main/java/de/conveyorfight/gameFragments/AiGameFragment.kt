@@ -88,7 +88,7 @@ class AiGameFragment() : GeneralGameInterface() {
     }
 
     override fun handleRoundEnd() {
-        playerCoins += 5
+        playerCoins += 5 + 3 * (round - 1)
     }
 
     override fun customHandleGameEnd() {

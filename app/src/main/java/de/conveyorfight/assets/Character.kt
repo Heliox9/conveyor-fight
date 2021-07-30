@@ -104,7 +104,7 @@ class Character(var hp: Int = 100,
             damage += if(blockedBy != null){
                 val isAdded = propertyArmor.find { pd -> pd.property == blockedBy }
                 if (isAdded != null) {
-                    min(0, propertyDamage.value - isAdded.value)
+                    maxOf(0, propertyDamage.value - isAdded.value)
                 } else {
                     propertyDamage.value
                 }
