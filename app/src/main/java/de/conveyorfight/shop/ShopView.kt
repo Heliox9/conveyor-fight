@@ -21,7 +21,6 @@ import kotlin.reflect.KFunction1
 //TODO: conveyor unterschiedlich breit, dadurch wiggelt das so weird.
 //TODO: Buttons designen...
 //TODO: buttons gegebenenfalls disablen
-//TODO: finished nicht
 //TODO: Greifhaken geht zu weit runter
 class ShopView(
     context: Context,
@@ -34,38 +33,42 @@ class ShopView(
     )
     : SurfaceView(context), Runnable{
 
-    private var rightArrowPosition: RectF
-    private var leftArrowPosition: RectF
-    private var buyButton: RectF
-    private var reserveButton: RectF
+    private lateinit var rightArrowPosition: RectF
+    private lateinit var leftArrowPosition: RectF
+    private lateinit var buyButton: RectF
+    private lateinit var reserveButton: RectF
 
     private var canvas: Canvas = Canvas()
     private val paint: Paint = Paint()
 
     private var size = DisplayMetrics()
-    private var hook: GrapplingHook
-    private val conveyor: Conveyor
+    private lateinit var hook: GrapplingHook
+    private lateinit var conveyor: Conveyor
     private var background: Bitmap = BitmapFactory.decodeResource(
         context.resources,
         R.drawable.background_wall)
 
 
-    private val firstItemCurrentPosition: RectF
-    private val firstItemEndPosition: RectF
+    private lateinit  var firstItemCurrentPosition: RectF
+    private lateinit var firstItemEndPosition: RectF
     private var itemInSpeed = 250f
     private val itemsBoughtIndexList = ArrayList<Int>()
 
     private val gameThread = Thread(this)
+    private var didDisplayLoad = false
 
     init {
-        //TODO: get Display metrics
+        gameThread.start()
+    }
+
+    private fun init () {
         display?.apply {
             getRealMetrics(size)
             println("s")
         }
         size.heightPixels = 1080
         size.widthPixels = 2220
-        println(size)
+
         this.createBackgroundBitmap()
         conveyor = Conveyor(context, size)
         hook = GrapplingHook(context, size)
@@ -79,7 +82,7 @@ class ShopView(
             (screenWidth/20) + screenWidth/10,
             conveyor.position.top
         )
-        println("item:" + screenWidth/20)
+
         firstItemCurrentPosition = RectF(
             firstItemEndPosition.left - (screenWidth),
             firstItemEndPosition.top,
@@ -110,27 +113,34 @@ class ShopView(
             screenWidth * 7 / 8,
             screenHeight*39/40
         )
-        gameThread.start()
+        didDisplayLoad = true
     }
 
     override fun run() {
         var fps: Long = 0
-        println("in ShopView")
         var lastConveyorChange = System.currentTimeMillis()
         val startTime = System.currentTimeMillis()
         while (true) {
             val startFrameTime = System.currentTimeMillis()
 
-            if(firstItemCurrentPosition.left < firstItemEndPosition.left){
-                if ((startFrameTime - lastConveyorChange) > 1000){
-                    conveyor.isFirstPicture = !conveyor.isFirstPicture
-                    lastConveyorChange = startFrameTime
-                }
-            }
 
             if (holder.surface.isValid) {
-                update(fps)
-                draw()
+                println("isValid")
+                if(display != null && !didDisplayLoad){
+                    println("displayLoad")
+                    init()
+                }
+                if(didDisplayLoad) {
+                    if(firstItemCurrentPosition.left < firstItemEndPosition.left){
+                        if ((startFrameTime - lastConveyorChange) > 1000){
+                            conveyor.isFirstPicture = !conveyor.isFirstPicture
+                            lastConveyorChange = startFrameTime
+                        }
+                    }
+                    println("draw")
+                    update(fps)
+                    draw()
+                }
             }
 
             val timeThisFrame = System.currentTimeMillis() - startFrameTime
@@ -208,12 +218,12 @@ class ShopView(
         val screenHalf = screenWidth/2
 
         val ovalPosition = RectF (
-            screenHalf - (screenWidth/20),
-            (screenHeight - (textSize * 1.5)).toFloat(),
-            screenHalf + (screenWidth/20),
+            screenHalf - (screenWidth/40),
+            (screenHeight - (textSize * 3.5)).toFloat(),
+            screenHalf + (screenWidth/40),
             (screenHeight - (textSize * 0.5)).toFloat())
 
-        paint.color = Color.argb(255, 240, 240, 40)
+        paint.color = Color.argb(255, 255, 140, 0)
         canvas.drawOval( ovalPosition, paint)
 
         val textPaint = Paint()
@@ -223,7 +233,7 @@ class ShopView(
         canvas.drawText(
             "$playerCoin",
             screenHalf,
-            ((screenHeight - (textSize * 0.5)).toFloat()),
+            ((screenHeight - (textSize * 1.5)).toFloat()),
             textPaint
         )
     }

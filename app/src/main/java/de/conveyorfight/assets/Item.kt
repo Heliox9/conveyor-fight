@@ -49,6 +49,7 @@ class Item(val context: Context,
             if(rarity == 1){
                 properties.add(generateARandomProperty())
             }
+            determineCost()
         } else { generateNonSpecialItem() }
     }
 
@@ -67,11 +68,7 @@ class Item(val context: Context,
             (2..4).random()
         }
 
-        cost = when (rarity) {
-            1 -> 5
-            2 -> 15
-            else -> 25
-        }
+        determineCost()
 
         if (rarity == 3) {
             val flashMin = Properties.Flash_Damage.detail.rarities[0].minValue;
@@ -101,6 +98,14 @@ class Item(val context: Context,
                     (rarityValue.minValue..rarityValue.maxValue).random()
                 )
             )
+        }
+    }
+
+    private fun determineCost() {
+        cost = when (rarity) {
+            1 -> 5
+            2 -> 15
+            else -> 25
         }
     }
 
