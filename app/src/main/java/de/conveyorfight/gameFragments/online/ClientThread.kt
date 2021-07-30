@@ -53,6 +53,9 @@ class ClientThread(val userName: String, val ip: String, val port: Int) : Thread
 
     var continueRunning = true
 
+    /**
+     * gracefully shutdown all resources including the output thread
+     */
     fun shutdown() {
         outThread.shutdown()
         input.close()
@@ -68,10 +71,16 @@ class ClientThread(val userName: String, val ip: String, val port: Int) : Thread
         // socket creation
         println("IP: $ip")
         println("Port: $port")
-
-        socket = Socket(ip, port)// TODO change/ make configurable
-        val output = PrintWriter(socket.getOutputStream(), true)
-        input = BufferedReader(InputStreamReader(socket.getInputStream()))
+        val output: PrintWriter
+        try {
+            socket = Socket(ip, port)
+            output = PrintWriter(socket.getOutputStream(), true)
+            input = BufferedReader(InputStreamReader(socket.getInputStream()))
+        } catch (e: Exception) {
+            e.printStackTrace()
+            error("Error occured while creating the connection to the server")
+            error("You might want to try setting the ip and port for the server in online.xml")
+        }
 
         outThread = OutThread(output)
         outThread.start()
@@ -92,6 +101,7 @@ class ClientThread(val userName: String, val ip: String, val port: Int) : Thread
         while (continueRunning) {
             appendIncoming(readFromServer())
         }
+
     }
 
     /**
