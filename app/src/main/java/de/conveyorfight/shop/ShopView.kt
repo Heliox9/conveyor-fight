@@ -17,10 +17,7 @@ import kotlin.reflect.KFunction0
 import kotlin.reflect.KFunction1
 
 
-//TODO: change button colors, background of music stuff
-//TODO: FightView refactoren
-//TODO: item verschwindet sofort, wenn man auf Kaufen klickt
-//TODO: Loose GIF & Win Gif
+
 class ShopView(
     context: Context,
     val shopItems: List<Item>,
