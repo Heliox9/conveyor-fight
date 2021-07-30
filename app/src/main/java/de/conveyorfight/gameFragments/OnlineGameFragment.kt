@@ -4,8 +4,10 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.navigation.Navigation
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
+import de.conveyorfight.R
 import de.conveyorfight.assets.Character
 import de.conveyorfight.assets.Item
 import de.conveyorfight.assets.PropertyValue
@@ -20,7 +22,7 @@ import java.util.*
 class OnlineGameFragment : GeneralGameInterface() {
     private val name = UUID.randomUUID().toString() // random name for the player to reference
     private lateinit var gson: Gson
-    private lateinit var thread: ClientThread
+    private var thread: ClientThread? = null
     private var stateBeforeDamage: GameState? = null
     private var stateAfterDamage: GameState? = null
     private var first: Boolean = true
@@ -52,8 +54,8 @@ class OnlineGameFragment : GeneralGameInterface() {
 
         gson = gsonBuilder.create()
 
-        thread = ClientThread(name)
-        thread.start()
+        thread = ClientThread(name, getString(R.string.ip), getString(R.string.port).toInt())
+        thread!!.start()
 
         // wait for thread to initialize
         Thread.sleep(100)
@@ -68,17 +70,21 @@ class OnlineGameFragment : GeneralGameInterface() {
 
         val json = gson.toJson(itemSelection)
         println("json: $json")
-        thread.addOutgoing(json)
+        thread?.addOutgoing(json)
 
         // read game state
-        stateBeforeDamage = gson.fromJson(thread.getNextIncoming(), GameState::class.java)
-        stateAfterDamage = gson.fromJson(thread.getNextIncoming(), GameState::class.java)
-        first = gson.fromJson(thread.getNextIncoming(), Boolean::class.java)
+        stateBeforeDamage = gson.fromJson(thread?.getNextIncoming(), GameState::class.java)
+        stateAfterDamage = gson.fromJson(thread?.getNextIncoming(), GameState::class.java)
+        first = gson.fromJson(thread?.getNextIncoming(), Boolean::class.java)
     }
 
     override fun customHandleGameEnd() {
         println("custom game end")
-        TODO("Not yet implemented")
+        thread!!.shutdown()
+        thread = null
+
+        Navigation.findNavController(requireView())
+            .navigate(R.id.action_onlineGameFragment_to_menuFragment)
     }
 
 
@@ -102,7 +108,7 @@ class OnlineGameFragment : GeneralGameInterface() {
      */
     override fun getPlayerCoin(): Int {
         println("getter money called")
-        money = gson.fromJson(thread.getNextIncoming(), Int::class.java)
+        money = gson.fromJson(thread?.getNextIncoming(), Int::class.java)
         return money
     }
 
@@ -113,27 +119,30 @@ class OnlineGameFragment : GeneralGameInterface() {
     override fun getPlayerItems(): Character {
         println("getPlayerItems")
         if (stateBeforeDamage != null) {
-            println("returning character from gamestate")
+            println("returning character from game state")
             return stateBeforeDamage!!.player
         }
 
-        character = gson.fromJson(thread.getNextIncoming(), Character::class.java)
+        println("attempting to read player character")
+        val message = thread?.getNextIncoming()
+        println(message)
+        character = gson.fromJson(message, Character::class.java)
         println("player : $character")
         return character
     }
 
     override fun getEnemyItems(): Character {
         println("getEnemyItems")
-        println("returning character from gamestate")
+        println("returning character from game state")
         return stateBeforeDamage!!.opponent
     }
 
     /**
      * add item to buy list and send selection over socket
      */
-    override fun handlePlayerBuy(toBuy: Item) {
+    override fun handlePlayerBuy(item: Item) {
         println("handlePlayerBuy")
-        itemSelection.bought.add(toBuy)
+        itemSelection.bought.add(item)
         println("bought added: $itemSelection")
     }
 
@@ -149,7 +158,7 @@ class OnlineGameFragment : GeneralGameInterface() {
      * clear saved list
      */
     override fun handlePlayerUnreserveItem() {
-        println("handlePlayerUnreserveItem")
+        println("handlePlayerUndoReserveItem")
         itemSelection.saved.clear()
     }
 
@@ -160,7 +169,7 @@ class OnlineGameFragment : GeneralGameInterface() {
      */
     override fun getShopItems(): List<Item> {
         println("getting items")
-        itemSelection = gson.fromJson(thread.getNextIncoming(), ItemSelection::class.java)
+        itemSelection = gson.fromJson(thread?.getNextIncoming(), ItemSelection::class.java)
         println("decoded: $itemSelection")
         return itemSelection.selection
     }

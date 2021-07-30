@@ -9,12 +9,11 @@ import android.view.SurfaceView
 import de.conveyorfight.R
 import de.conveyorfight.assets.Character
 import de.conveyorfight.assets.Item
+import java.util.*
 import kotlin.math.ceil
 
 
-//TODO: clonables maybe
-//TODO: namen für Properties
-//TODO: Zauberstab falsche kosten
+
 class FightView(
     context: Context,
     private val isPlayerFirst: Boolean,
@@ -29,10 +28,10 @@ class FightView(
     private var canvas: Canvas = Canvas()
     private val paint: Paint = Paint()
     private val size = DisplayMetrics()
-    private val textSize: Float
-    private val heightUnit: Int
-    private var victoryGif: AnimatedImageDrawable
-    private var defeatGif: AnimatedImageDrawable
+    private var textSize: Float = 0F
+    private var heightUnit: Int = 0
+    private var victoryGif: AnimatedImageDrawable = AnimatedImageDrawable()
+    private var defeatGif: AnimatedImageDrawable = AnimatedImageDrawable()
 
     var characterBitMap = BitmapFactory.decodeResource(
         context.resources,
@@ -50,13 +49,11 @@ class FightView(
         context.resources,
         R.drawable.tile)
 
-    init {
-        //TODO: richtige Metrics bekommen, vielleicht gibt es bessere Inits für Views
+    private fun init () {
         display?.apply {
             getRealMetrics(size)
         }
-        size.heightPixels = 1080
-        size.widthPixels = 2220
+
         background = createFullScreenBitmap(background)
         characterSplash = createFullScreenBitmap(characterSplash)
 
@@ -69,7 +66,7 @@ class FightView(
         val defeatSource = ImageDecoder.createSource(context.assets, "defeat.gif")
         defeatGif = ImageDecoder.decodeDrawable(defeatSource) as AnimatedImageDrawable
 
-        textSize = (size.heightPixels/20).toFloat()
+        textSize = (size.heightPixels/30).toFloat()
     }
 
     fun start () {
@@ -97,9 +94,8 @@ class FightView(
         return Bitmap.createScaledBitmap(bitmap, backgroundWidth, backgroundHeight, true)
     }
 
-    fun drawScene() { //TODO: refactor, make a setScene
-        println("in FightView")
-        println(display)
+    private fun drawScene() {
+        init()
 
         canvas = holder.lockCanvas()
         canvas.drawBitmap(background, 0F, 0F, null)
@@ -130,20 +126,38 @@ class FightView(
 
         Thread.sleep(3000)
 
-        if(enemyCharacter.hp <= 0 || playerCharacter.hp <= 0){
-            canvas = holder.lockCanvas()
-            canvas.drawBitmap(background, 0F, 0F, null)
-            drawCharacter(if(isPlayerFirst) playerCharacter else playerCharacterAfterDamage, true)
-            drawCharacter(if(isPlayerFirst) enemyCharacterAfterDamage else enemyCharacter, false)
-            drawItems()
-
-            if (isPlayerFirst){
+        if(isPlayerFirst) {
+            if (enemyCharacterAfterDamage.hp <= 0) {
+                canvas = holder.lockCanvas()
+                canvas.drawBitmap(background, 0F, 0F, null)
+                drawCharacter(
+                    if (isPlayerFirst) playerCharacter else playerCharacterAfterDamage,
+                    true
+                )
+                drawCharacter(
+                    if (isPlayerFirst) enemyCharacterAfterDamage else enemyCharacter,
+                    false
+                )
+                drawItems()
                 handleWin()
-            } else {
-                handleLoose()
+                return
             }
-            holder.unlockCanvasAndPost(canvas)
-            return
+        } else {
+            if (playerCharacterAfterDamage.hp <= 0){
+                canvas = holder.lockCanvas()
+                canvas.drawBitmap(background, 0F, 0F, null)
+                drawCharacter(
+                    if (isPlayerFirst) playerCharacter else playerCharacterAfterDamage,
+                    true
+                )
+                drawCharacter(
+                    if (isPlayerFirst) enemyCharacterAfterDamage else enemyCharacter,
+                    false
+                )
+                drawItems()
+                handleLoose()
+                return
+            }
         }
 
         canvas = holder.lockCanvas()
@@ -165,19 +179,38 @@ class FightView(
 
         Thread.sleep(3000)
 
-        if(enemyCharacter.hp <= 0 || playerCharacter.hp <= 0){
-            canvas = holder.lockCanvas()
-            canvas.drawBitmap(background, 0F, 0F, null)
-            drawCharacter(if(isPlayerFirst) playerCharacter else playerCharacterAfterDamage, true)
-            drawCharacter(if(isPlayerFirst) enemyCharacterAfterDamage else enemyCharacter, false)
-            drawItems()
-
-            if (!isPlayerFirst){
-                handleWin()
-            } else {
+        if (isPlayerFirst) {
+            if (playerCharacterAfterDamage.hp <= 0){
+                canvas = holder.lockCanvas()
+                canvas.drawBitmap(background, 0F, 0F, null)
+                drawCharacter(
+                    if (isPlayerFirst) playerCharacter else playerCharacterAfterDamage,
+                    true
+                )
+                drawCharacter(
+                    if (isPlayerFirst) enemyCharacterAfterDamage else enemyCharacter,
+                    false
+                )
+                drawItems()
                 handleLoose()
+                return
             }
-            holder.unlockCanvasAndPost(canvas)
+        } else {
+            if (enemyCharacterAfterDamage.hp <= 0) {
+                canvas = holder.lockCanvas()
+                canvas.drawBitmap(background, 0F, 0F, null)
+                drawCharacter(
+                    if (isPlayerFirst) playerCharacter else playerCharacterAfterDamage,
+                    true
+                )
+                drawCharacter(
+                    if (isPlayerFirst) enemyCharacterAfterDamage else enemyCharacter,
+                    false
+                )
+                drawItems()
+                handleWin()
+                return
+            }
         }
         handleRoundEnd()
     }
@@ -186,37 +219,37 @@ class FightView(
         //items
         val screenWidth = size.widthPixels
         val spaceUnit = heightUnit.toFloat()
-        val firstRowTop = spaceUnit
-        val secondRowTop = spaceUnit * 3
-        val thirdRowTop = (firstRowTop + heightUnit).toFloat()
+        val firstRowTop = spaceUnit * 2
+        val secondRowTop = spaceUnit * 4
+        val thirdRowTop = spaceUnit * 3
 
         //helmet
         drawTile(playerCharacter.helmet, spaceUnit, firstRowTop, true)
         drawTile(enemyCharacter.helmet, screenWidth - (spaceUnit + heightUnit), firstRowTop, false)
 
         //armor
-        drawTile(playerCharacter.armor, 2 * spaceUnit, firstRowTop, true)
-        drawTile(enemyCharacter.armor, screenWidth - (2 * spaceUnit + heightUnit), firstRowTop, false)
+        drawTile(playerCharacter.armor, 3 * spaceUnit, firstRowTop, true)
+        drawTile(enemyCharacter.armor, screenWidth - (3 * spaceUnit + heightUnit), firstRowTop, false)
 
         //gloves
-        drawTile(playerCharacter.gloves, 3 * spaceUnit, firstRowTop, true)
-        drawTile(enemyCharacter.gloves, screenWidth - (3 * spaceUnit + heightUnit), firstRowTop, false)
+        drawTile(playerCharacter.gloves, 5 * spaceUnit, firstRowTop, true)
+        drawTile(enemyCharacter.gloves, screenWidth - (5 * spaceUnit + heightUnit), firstRowTop, false)
 
         //pants
         drawTile(playerCharacter.pants, spaceUnit, secondRowTop, true)
         drawTile(enemyCharacter.pants, screenWidth - (spaceUnit + heightUnit), secondRowTop, false)
 
         //shoes
-        drawTile(playerCharacter.shoes, 2 * spaceUnit, secondRowTop, true)
-        drawTile(enemyCharacter.shoes, screenWidth - (2 * spaceUnit + heightUnit), secondRowTop, false)
+        drawTile(playerCharacter.shoes, 3 * spaceUnit, secondRowTop, true)
+        drawTile(enemyCharacter.shoes, screenWidth - (3 * spaceUnit + heightUnit), secondRowTop, false)
 
         //special
-        drawTile(playerCharacter.special, 3 * spaceUnit, secondRowTop, true)
-        drawTile(enemyCharacter.special, screenWidth - (3 * spaceUnit + heightUnit), secondRowTop, false)
+        drawTile(playerCharacter.special, 5 * spaceUnit, secondRowTop, true)
+        drawTile(enemyCharacter.special, screenWidth - (5 * spaceUnit + heightUnit), secondRowTop, false)
 
         //weapon
-        drawTile(playerCharacter.weapon, 4 * spaceUnit, thirdRowTop, true)
-        drawTile(enemyCharacter.weapon, screenWidth - (4 * spaceUnit + heightUnit), thirdRowTop, false)
+        drawTile(playerCharacter.weapon, 7 * spaceUnit, thirdRowTop, true)
+        drawTile(enemyCharacter.weapon, screenWidth - (7 * spaceUnit + heightUnit), thirdRowTop, false)
 
     }
 
@@ -232,9 +265,12 @@ class FightView(
                     val currentProperty = item.properties[i]
                     paint.textSize = textSize
                     paint.color = Color.argb(255, 255, 255, 255)
-                    canvas.drawText("${currentProperty.property.name}: ${currentProperty.value}",
+                    val text = currentProperty.property.name.replace("_", " ")
+                        .lowercase(Locale.getDefault())
+                        .replaceFirstChar { it.uppercase() }
+                    canvas.drawText("${text}: ${currentProperty.value}",
                         xPosition,
-                        yPosition + ((textSize + 4) *(i + 1)),
+                        yPosition - ((textSize + 4) *(i + 1)),
                         paint)
                     i++
                 }
@@ -286,14 +322,11 @@ class FightView(
         canvas.drawBitmap(characterSplashScreen,0f, 0f, null)
     }
 
-    private fun handleWin() { //TODO
-        println("victory!")
+    private fun handleWin() {
         victoryGif
         victoryGif.start()
         victoryGif.draw(canvas)
-        println("draw victory")
         holder.unlockCanvasAndPost(canvas)
-        println("nach draw")
         handleGameEnd()
         Thread.sleep(5000)
     }
@@ -301,7 +334,9 @@ class FightView(
     private fun handleLoose() {
         defeatGif.draw(canvas)
         defeatGif.start()
+        holder.unlockCanvasAndPost(canvas)
         handleGameEnd()
+        Thread.sleep( 5000)
     }
 
     private fun createFlippedBitmap(source: Bitmap): Bitmap {

@@ -31,12 +31,12 @@ class Conveyor(context: Context, size: DisplayMetrics) {
         val conveyorWidth: Double
 
         val heightRatio =  screenHeight/ (4*bitmapHeight)
-        val widthRatio = (screenWidth * 9) / (10 * bitmapWidth)
+        val widthRatio = screenWidth / bitmapWidth
         if( widthRatio > heightRatio ){
-            conveyorWidth = (screenWidth * 9) / 10
+            conveyorWidth = screenWidth
             conveyorHeight = bitmapHeight * widthRatio
         } else {
-            conveyorWidth =bitmapWidth * heightRatio
+            conveyorWidth = bitmapWidth * heightRatio
             conveyorHeight = screenHeight / 4
         }
 
@@ -51,9 +51,9 @@ class Conveyor(context: Context, size: DisplayMetrics) {
             false)
 
         position = RectF(
-            ((screenWidth - screenWidth/10) - conveyorWidth).toFloat(),
+            ((screenWidth - screenHeight/10) - conveyorWidth).toFloat(),
             (screenHeight - conveyorHeight).toFloat(),
-            (screenWidth - screenWidth/10).toFloat(),
+            (screenWidth - screenHeight/10).toFloat(),
             screenHeight.toFloat())
     }
 

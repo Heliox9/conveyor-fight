@@ -17,7 +17,7 @@ class Item(
     var cost: Int = 5,
     var properties: ArrayList<PropertyValue> = ArrayList<PropertyValue>(),
     var uuid: UUID? = null
-) {
+) : Cloneable {
 
     public fun getContext(): Context {
         return context
@@ -61,7 +61,7 @@ class Item(
             if (rarity == 1) {
                 properties.add(generateARandomProperty())
             }
-
+            determineCost()
         } else {
             generateNonSpecialItem()
         }
@@ -83,11 +83,7 @@ class Item(
             (2..4).random()
         }
 
-        cost = when (rarity) {
-            1 -> 5
-            2 -> 15
-            else -> 25
-        }
+        determineCost()
 
         if (rarity == 3) {
             val flashMin = Properties.Flash_Damage.detail.rarities[0].minValue;
@@ -117,6 +113,14 @@ class Item(
                     (rarityValue.minValue..rarityValue.maxValue).random()
                 )
             )
+        }
+    }
+
+    private fun determineCost() {
+        cost = when (rarity) {
+            1 -> 5
+            2 -> 15
+            else -> 25
         }
     }
 
@@ -188,10 +192,10 @@ class Item(
         }
     }
 
-    fun clone(): Item {
+    public override fun clone(): Item {
         val item = Item(
             context, round, rarity, itemType, cost,
-            properties.clone() as ArrayList<PropertyValue>, uuid
+            properties.clone() as ArrayList<PropertyValue>
         )
         item.createBitmap()
         return item
@@ -282,7 +286,6 @@ class Item(
             }
 
             return merchant
-            TODO("Not yet implemented")
         }
 
     }

@@ -6,7 +6,8 @@ import java.io.PrintWriter
 import java.net.Socket
 import java.util.*
 
-class ClientThread(val userName: String) : Thread() {
+class ClientThread(private val userName: String, private val ip: String, private val port: Int) :
+    Thread() {
     private lateinit var socket: Socket
     private lateinit var input: BufferedReader
     private val incoming = LinkedList<String>()
@@ -51,14 +52,36 @@ class ClientThread(val userName: String) : Thread() {
         return read
     }
 
+    private var continueRunning = true
+
+    /**
+     * gracefully shutdown all resources including the output thread
+     */
+    fun shutdown() {
+        continueRunning = false
+        outThread.shutdown()
+        input.close()
+        incoming.clear()
+
+    }
+
     /**
      * executes handshake and loops to server the queues
      */
     override fun run() {
         // socket creation
-        socket = Socket("192.168.178.233", 88)// TODO change/ make configurable
-        val output = PrintWriter(socket.getOutputStream(), true)
-        input = BufferedReader(InputStreamReader(socket.getInputStream()))
+        println("IP: $ip")
+        println("Port: $port")
+        val output: PrintWriter
+        try {
+            socket = Socket(ip, port)
+            output = PrintWriter(socket.getOutputStream(), true)
+            input = BufferedReader(InputStreamReader(socket.getInputStream()))
+        } catch (e: Exception) {
+            e.printStackTrace()
+            println("You might want to try setting the ip and port for the server in online.xml")
+            error("Error occurred while creating the connection to the server")
+        }
 
         outThread = OutThread(output)
         outThread.start()
@@ -76,9 +99,10 @@ class ClientThread(val userName: String) : Thread() {
 
 
         // always up loop to send and receive messages
-        while (true) {
+        while (continueRunning) {
             appendIncoming(readFromServer())
         }
+
     }
 
     /**

@@ -3,9 +3,16 @@ package de.conveyorfight.gameFragments.online
 import java.io.PrintWriter
 import java.util.*
 
-class OutThread(val writer: PrintWriter) : Thread() {
+class OutThread(private val writer: PrintWriter) : Thread() {
 
     private val outgoing = LinkedList<String>()
+    private var continueRunning = true
+
+    fun shutdown() {
+        continueRunning = false
+        outgoing.clear()
+        writer.close()
+    }
 
     /**
      * push message to outgoing queue
@@ -21,7 +28,7 @@ class OutThread(val writer: PrintWriter) : Thread() {
 
 
     override fun run() {
-        while (true) {
+        while (continueRunning) {
             if (outgoing.size > 0) sendToServer(outgoing.poll())
         }
     }
