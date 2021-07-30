@@ -7,11 +7,11 @@
     android:layout_height="match_parent"
     tools:context="menu.MenuFragment">
 
-    <!--TODO replace background-->
     <Button
         android:id="@+id/menu_play_button"
         android:layout_width="150dp"
         android:layout_height="80dp"
+        android:backgroundTint="#8c1313"
         android:text="@string/menu_to_fight_btn"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@id/menu_play_online_button"
@@ -22,18 +22,19 @@
         android:id="@+id/menu_play_online_button"
         android:layout_width="150dp"
         android:layout_height="80dp"
+        android:backgroundTint="#8c1313"
         android:text="@string/menu_to_fight_online_btn"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@id/menu_play_button"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <!--    TODO replace placeholder icons-->
     <ImageButton
         android:id="@+id/music_volume_btn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:src="@android:drawable/ic_lock_silent_mode_off"
+        android:backgroundTint="#00000000"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         tools:layout_editor_absoluteX="70dp"
@@ -43,9 +44,8 @@
         android:id="@+id/music_seekBar"
         android:layout_width="200dp"
         android:layout_height="0dp"
-        android:background="@color/design_default_color_secondary"
-        android:progressTint="@color/design_default_color_primary"
-        android:thumbTint="@color/design_default_color_primary"
+        android:progressTint="#8C1313"
+        android:thumbTint="#8C1313"
         android:visibility="invisible"
         app:layout_constraintBottom_toBottomOf="@id/music_volume_btn"
         app:layout_constraintStart_toEndOf="@id/music_volume_btn"

@@ -60,10 +60,10 @@ class FightView(
         heightUnit = size.heightPixels / 8
         tile = Bitmap.createScaledBitmap(tile, heightUnit, heightUnit, false)
 
-        val victorySource = ImageDecoder.createSource(context.assets, "victory.gif")
+        val victorySource = ImageDecoder.createSource(context.resources, R.raw.victory)
         victoryGif = ImageDecoder.decodeDrawable(victorySource) as AnimatedImageDrawable
 
-        val defeatSource = ImageDecoder.createSource(context.assets, "defeat.gif")
+        val defeatSource = ImageDecoder.createSource(context.resources, R.raw.defeat)
         defeatGif = ImageDecoder.decodeDrawable(defeatSource) as AnimatedImageDrawable
 
         textSize = (size.heightPixels/30).toFloat()
@@ -102,6 +102,7 @@ class FightView(
         drawCharacter(playerCharacter, true)
         drawCharacter(enemyCharacter, false)
         drawItems()
+        handleWin()
 
         holder.unlockCanvasAndPost(canvas)
 
