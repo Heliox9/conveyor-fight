@@ -92,7 +92,7 @@ class AiGameFragment() : GeneralGameInterface() {
     }
 
     override fun handleShopFinished() {
-        TODO("Not yet implemented")
+        //TODO("Nothing to do here")
     }
 
     override fun customHandleGameEnd() {

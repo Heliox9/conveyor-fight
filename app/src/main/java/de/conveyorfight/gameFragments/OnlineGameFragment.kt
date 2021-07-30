@@ -133,9 +133,9 @@ class OnlineGameFragment : GeneralGameInterface() {
     /**
      * add item to buy list and send selection over socket
      */
-    override fun handlePlayerBuy(toBuy: Item) {
+    override fun handlePlayerBuy(item: Item) {
         println("handlePlayerBuy")
-        itemSelection.bought.add(toBuy)
+        itemSelection.bought.add(item)
         println("bought added: $itemSelection")
     }
 

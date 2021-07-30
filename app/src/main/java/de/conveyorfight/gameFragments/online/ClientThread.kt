@@ -78,8 +78,8 @@ class ClientThread(val userName: String, val ip: String, val port: Int) : Thread
             input = BufferedReader(InputStreamReader(socket.getInputStream()))
         } catch (e: Exception) {
             e.printStackTrace()
+            println("You might want to try setting the ip and port for the server in online.xml")
             error("Error occured while creating the connection to the server")
-            error("You might want to try setting the ip and port for the server in online.xml")
         }
 
         outThread = OutThread(output)

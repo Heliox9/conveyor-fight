@@ -62,7 +62,9 @@ class Item(
                 properties.add(generateARandomProperty())
             }
             determineCost()
-        } else { generateNonSpecialItem() }
+        } else {
+            generateNonSpecialItem()
+        }
     }
 
     private fun generateARandomProperty(): PropertyValue {
@@ -284,7 +286,6 @@ class Item(
             }
 
             return merchant
-            TODO("Not yet implemented")
         }
 
     }
