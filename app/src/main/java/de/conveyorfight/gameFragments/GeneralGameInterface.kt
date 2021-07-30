@@ -83,9 +83,6 @@ abstract class GeneralGameInterface : Fragment() {
 
     abstract fun getPlayerCoin(): Int
 
-    abstract fun getPlayerHP(): Int
-
-    abstract fun getEnemyHP(): Int
 
     abstract fun handleWin()
 

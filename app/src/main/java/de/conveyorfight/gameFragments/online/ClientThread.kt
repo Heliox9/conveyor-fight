@@ -6,7 +6,7 @@ import java.io.PrintWriter
 import java.net.Socket
 import java.util.*
 
-class ClientThread : Thread() {
+class ClientThread(val userName: String) : Thread() {
     private lateinit var socket: Socket
     private lateinit var input: BufferedReader
     private val incoming = LinkedList<String>()
@@ -64,7 +64,7 @@ class ClientThread : Thread() {
 
 
         // server handshake
-        outThread.addOutgoing("App")// sending name
+        outThread.addOutgoing(userName)// sending name
         readFromServer()// game id
         readFromServer()//opponent
 

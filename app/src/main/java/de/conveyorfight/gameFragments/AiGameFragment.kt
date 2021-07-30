@@ -17,10 +17,10 @@ class AiGameFragment() : GeneralGameInterface() {
     override fun getShopItems(): List<Item> {
         val shopItems = ArrayList<Item>()
         val numberOfItemsToGenerate = if (playerReservedItem == null) 4 else 3
-        for (i in numberOfItemsToGenerate downTo 0 step 1){
+        for (i in numberOfItemsToGenerate downTo 0 step 1) {
             shopItems.add(Item(requireContext(), this.round))
         }
-        if (playerReservedItem != null){
+        if (playerReservedItem != null) {
             shopItems.add(playerReservedItem!!)
             playerReservedItem = null
         }
@@ -61,7 +61,7 @@ class AiGameFragment() : GeneralGameInterface() {
 
     override fun getEnemyItems(): Character {
         val item = Item(requireContext(), round)
-        if(item.itemType == ItemTypes.Special){
+        if (item.itemType == ItemTypes.Special) {
             return getEnemyItems()
         }
         enemyCharacter.add(item)
@@ -71,7 +71,7 @@ class AiGameFragment() : GeneralGameInterface() {
     override fun handlePlayerBuy(item: Item) {
         if (playerCoins < item.cost) return
         if (item.itemType == ItemTypes.Special && item.rarity == 2) {
-            if(!playerCharacter.isUpgradeAble()) return
+            if (!playerCharacter.isUpgradeAble()) return
             playerCharacter.upgradeRandomItem()
         } else {
             playerCharacter.add(item)
@@ -87,13 +87,6 @@ class AiGameFragment() : GeneralGameInterface() {
         playerReservedItem = null
     }
 
-    override fun getPlayerHP(): Int {
-        return playerCharacter.hp
-    }
-
-    override fun getEnemyHP(): Int {
-        return enemyCharacter.hp
-    }
 
     override fun handleRoundEnd() {
         playerCoins += 5

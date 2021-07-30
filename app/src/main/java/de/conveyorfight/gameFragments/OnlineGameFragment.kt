@@ -10,15 +10,20 @@ import de.conveyorfight.assets.Character
 import de.conveyorfight.assets.Item
 import de.conveyorfight.assets.PropertyValue
 import de.conveyorfight.gameFragments.online.ClientThread
+import de.conveyorfight.gameFragments.online.GameState
 import de.conveyorfight.gameFragments.online.ItemSelection
+import java.util.*
 
 /**
  * GameFragment implementation for online versus mode
  */
 class OnlineGameFragment : GeneralGameInterface() {
-
+    private val name = UUID.randomUUID().toString() // random name for the player to reference
     private lateinit var gson: Gson
     private lateinit var thread: ClientThread
+    private var stateBeforeDamage: GameState? = null
+    private var stateAfterDamage: GameState? = null
+    private var first: Boolean? = null
 
     private lateinit var character: Character
     private var money: Int = -42
@@ -39,7 +44,7 @@ class OnlineGameFragment : GeneralGameInterface() {
 
         gson = gsonBuilder.create()
 
-        thread = ClientThread()
+        thread = ClientThread(name)
         thread.start()
 
         // wait for thread to initialize
@@ -54,6 +59,11 @@ class OnlineGameFragment : GeneralGameInterface() {
         val json = gson.toJson(itemSelection)
         println("json: $json")
         thread.addOutgoing(json)
+
+        // read game state
+        stateBeforeDamage = gson.fromJson(thread.getNextIncoming(), GameState::class.java)
+        stateAfterDamage = gson.fromJson(thread.getNextIncoming(), GameState::class.java)
+        first = gson.fromJson(thread.getNextIncoming(), Boolean::class.java)
     }
 
     override fun customHandleGameEnd() {
@@ -64,17 +74,17 @@ class OnlineGameFragment : GeneralGameInterface() {
 
     override fun getPlayerAfterDamage(): Character {
         println("getPlayerAfterDamage")
-        TODO("Not yet implemented")
+        return stateAfterDamage!!.player
     }
 
     override fun getEnemyAfterDamage(): Character {
         println("getEnemyAfterDamage")
-        TODO("Not yet implemented")
+        return stateAfterDamage!!.opponent
     }
 
     override fun isPlayerFirst(): Boolean {
         println("isPlayerFirst")
-        TODO("Not yet implemented")
+        return first!!
     }
 
     /**
@@ -86,15 +96,6 @@ class OnlineGameFragment : GeneralGameInterface() {
         return money
     }
 
-    override fun getPlayerHP(): Int {
-        println("getPlayerHP")
-        TODO("Not yet implemented")
-    }
-
-    override fun getEnemyHP(): Int {
-        println("getEnemyHP")
-        TODO("Not yet implemented")
-    }
 
     override fun handleWin() {
         println("handleWin")
@@ -111,6 +112,11 @@ class OnlineGameFragment : GeneralGameInterface() {
      */
     override fun getPlayerItems(): Character {
         println("getPlayerItems")
+        if (stateBeforeDamage != null) {
+            println("returning character from gamestate")
+            return stateBeforeDamage!!.player
+        }
+
         character = gson.fromJson(thread.getNextIncoming(), Character::class.java)
         println("player: $character")
         return character
@@ -118,8 +124,8 @@ class OnlineGameFragment : GeneralGameInterface() {
 
     override fun getEnemyItems(): Character {
         println("getEnemyItems")
-
-        TODO("Not yet implemented")
+        println("returning character from gamestate")
+        return stateBeforeDamage!!.opponent
     }
 
     /**
@@ -161,6 +167,8 @@ class OnlineGameFragment : GeneralGameInterface() {
 
     override fun handleRoundEnd() {
         println("handleRoundEnd")
-        TODO("Not yet implemented")
+        stateBeforeDamage = null
+        stateAfterDamage = null
+        first = null
     }
 }
