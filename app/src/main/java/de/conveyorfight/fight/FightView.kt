@@ -9,12 +9,11 @@ import android.view.SurfaceView
 import de.conveyorfight.R
 import de.conveyorfight.assets.Character
 import de.conveyorfight.assets.Item
+import java.util.*
 import kotlin.math.ceil
 
 
 //TODO: clonables maybe
-//TODO: namen für Properties
-//TODO: Zauberstab falsche kosten
 class FightView(
     context: Context,
     private val isPlayerFirst: Boolean,
@@ -29,10 +28,10 @@ class FightView(
     private var canvas: Canvas = Canvas()
     private val paint: Paint = Paint()
     private val size = DisplayMetrics()
-    private val textSize: Float
-    private val heightUnit: Int
-    private var victoryGif: AnimatedImageDrawable
-    private var defeatGif: AnimatedImageDrawable
+    private var textSize: Float = 0F
+    private var heightUnit: Int = 0
+    private var victoryGif: AnimatedImageDrawable = AnimatedImageDrawable()
+    private var defeatGif: AnimatedImageDrawable = AnimatedImageDrawable()
 
     var characterBitMap = BitmapFactory.decodeResource(
         context.resources,
@@ -50,13 +49,11 @@ class FightView(
         context.resources,
         R.drawable.tile)
 
-    init {
-        //TODO: richtige Metrics bekommen, vielleicht gibt es bessere Inits für Views
+    private fun init () {
         display?.apply {
             getRealMetrics(size)
         }
-        size.heightPixels = 1080
-        size.widthPixels = 2220
+
         background = createFullScreenBitmap(background)
         characterSplash = createFullScreenBitmap(characterSplash)
 
@@ -69,7 +66,7 @@ class FightView(
         val defeatSource = ImageDecoder.createSource(context.assets, "defeat.gif")
         defeatGif = ImageDecoder.decodeDrawable(defeatSource) as AnimatedImageDrawable
 
-        textSize = (size.heightPixels/20).toFloat()
+        textSize = (size.heightPixels/25).toFloat()
     }
 
     fun start () {
@@ -97,9 +94,8 @@ class FightView(
         return Bitmap.createScaledBitmap(bitmap, backgroundWidth, backgroundHeight, true)
     }
 
-    fun drawScene() { //TODO: refactor, make a setScene
-        println("in FightView")
-        println(display)
+    private fun drawScene() { //TODO: refactor, make a setScene
+        init()
 
         canvas = holder.lockCanvas()
         canvas.drawBitmap(background, 0F, 0F, null)
@@ -130,20 +126,38 @@ class FightView(
 
         Thread.sleep(3000)
 
-        if(enemyCharacter.hp <= 0 || playerCharacter.hp <= 0){
-            canvas = holder.lockCanvas()
-            canvas.drawBitmap(background, 0F, 0F, null)
-            drawCharacter(if(isPlayerFirst) playerCharacter else playerCharacterAfterDamage, true)
-            drawCharacter(if(isPlayerFirst) enemyCharacterAfterDamage else enemyCharacter, false)
-            drawItems()
-
-            if (isPlayerFirst){
+        if(isPlayerFirst) {
+            if (enemyCharacterAfterDamage.hp <= 0) {
+                canvas = holder.lockCanvas()
+                canvas.drawBitmap(background, 0F, 0F, null)
+                drawCharacter(
+                    if (isPlayerFirst) playerCharacter else playerCharacterAfterDamage,
+                    true
+                )
+                drawCharacter(
+                    if (isPlayerFirst) enemyCharacterAfterDamage else enemyCharacter,
+                    false
+                )
+                drawItems()
                 handleWin()
-            } else {
-                handleLoose()
+                return
             }
-            holder.unlockCanvasAndPost(canvas)
-            return
+        } else {
+            if (playerCharacterAfterDamage.hp <= 0){
+                canvas = holder.lockCanvas()
+                canvas.drawBitmap(background, 0F, 0F, null)
+                drawCharacter(
+                    if (isPlayerFirst) playerCharacter else playerCharacterAfterDamage,
+                    true
+                )
+                drawCharacter(
+                    if (isPlayerFirst) enemyCharacterAfterDamage else enemyCharacter,
+                    false
+                )
+                drawItems()
+                handleLoose()
+                return
+            }
         }
 
         canvas = holder.lockCanvas()
@@ -165,19 +179,38 @@ class FightView(
 
         Thread.sleep(3000)
 
-        if(enemyCharacter.hp <= 0 || playerCharacter.hp <= 0){
-            canvas = holder.lockCanvas()
-            canvas.drawBitmap(background, 0F, 0F, null)
-            drawCharacter(if(isPlayerFirst) playerCharacter else playerCharacterAfterDamage, true)
-            drawCharacter(if(isPlayerFirst) enemyCharacterAfterDamage else enemyCharacter, false)
-            drawItems()
-
-            if (!isPlayerFirst){
-                handleWin()
-            } else {
+        if (isPlayerFirst) {
+            if (playerCharacterAfterDamage.hp <= 0){
+                canvas = holder.lockCanvas()
+                canvas.drawBitmap(background, 0F, 0F, null)
+                drawCharacter(
+                    if (isPlayerFirst) playerCharacter else playerCharacterAfterDamage,
+                    true
+                )
+                drawCharacter(
+                    if (isPlayerFirst) enemyCharacterAfterDamage else enemyCharacter,
+                    false
+                )
+                drawItems()
                 handleLoose()
+                return
             }
-            holder.unlockCanvasAndPost(canvas)
+        } else {
+            if (enemyCharacterAfterDamage.hp <= 0) {
+                canvas = holder.lockCanvas()
+                canvas.drawBitmap(background, 0F, 0F, null)
+                drawCharacter(
+                    if (isPlayerFirst) playerCharacter else playerCharacterAfterDamage,
+                    true
+                )
+                drawCharacter(
+                    if (isPlayerFirst) enemyCharacterAfterDamage else enemyCharacter,
+                    false
+                )
+                drawItems()
+                handleWin()
+                return
+            }
         }
         handleRoundEnd()
     }
@@ -232,9 +265,12 @@ class FightView(
                     val currentProperty = item.properties[i]
                     paint.textSize = textSize
                     paint.color = Color.argb(255, 255, 255, 255)
-                    canvas.drawText("${currentProperty.property.name}: ${currentProperty.value}",
+                    val text = currentProperty.property.name.replace("_", " ")
+                        .lowercase(Locale.getDefault())
+                        .replaceFirstChar { it.uppercase() }
+                    canvas.drawText("${text}: ${currentProperty.value}",
                         xPosition,
-                        yPosition + ((textSize + 4) *(i + 1)),
+                        yPosition - ((textSize + 4) *(i + 1)),
                         paint)
                     i++
                 }
@@ -301,7 +337,9 @@ class FightView(
     private fun handleLoose() {
         defeatGif.draw(canvas)
         defeatGif.start()
+        holder.unlockCanvasAndPost(canvas)
         handleGameEnd()
+        Thread.sleep( 5000)
     }
 
     private fun createFlippedBitmap(source: Bitmap): Bitmap {
