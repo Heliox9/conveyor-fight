@@ -128,7 +128,6 @@ class Item(
         }
     }
 
-    //TODO: wo ist die Hose hin?
     fun createBitmap() {
         bitmap = when (ItemTypeRarity(itemType!!, rarity)) {
             ItemTypeRarity(ItemTypes.Helmet, 1) ->

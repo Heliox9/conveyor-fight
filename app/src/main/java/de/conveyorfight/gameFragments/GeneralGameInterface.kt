@@ -30,7 +30,6 @@ abstract class GeneralGameInterface : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         super.onCreate(savedInstanceState)
-        //TODO: unter Umständen mache eine Rebootfunktion für die ShopView
 
         switcher = ViewAnimator(requireContext())
         switcher!!.addView(getShopView())
@@ -92,7 +91,9 @@ abstract class GeneralGameInterface : Fragment() {
 
     private fun handleGameEnd() {
         customHandleGameEnd()
-        Navigation.findNavController(requireView()).navigate(R.id.menuFragment)
+        println("in Navigation")
+        timer.cancel()
+        Navigation.findNavController(requireView()).navigate(R.id.action_aiGameFragment_to_menuFragment)
     }
 
     abstract fun handleShopFinished()

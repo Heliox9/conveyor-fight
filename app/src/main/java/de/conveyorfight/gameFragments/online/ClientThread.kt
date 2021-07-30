@@ -46,7 +46,7 @@ class ClientThread(val userName: String) : Thread() {
      */
     private fun readFromServer(): String {
         val read = input.readLine()
-        println("receiving: $read")
+//        println("receiving: $read")
         if (read.isNullOrBlank()) return ""
         return read
     }

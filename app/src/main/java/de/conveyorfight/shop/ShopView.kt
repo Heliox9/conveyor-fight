@@ -10,7 +10,7 @@ import de.conveyorfight.assets.Character
 import de.conveyorfight.assets.Conveyor
 import de.conveyorfight.assets.GrapplingHook
 import de.conveyorfight.assets.Item
-import java.util.*
+import java.util.ArrayList
 import kotlin.math.ceil
 import kotlin.math.roundToInt
 import kotlin.reflect.KFunction0
@@ -20,10 +20,13 @@ import kotlin.reflect.KFunction1
 //TODO: change button colors, background of music stuff
 //TODO: conveyor unterschiedlich breit, dadurch wiggelt das so weird.
 //TODO: Buttons designen...
+//TODO: buttons gegebenenfalls disablen
+//TODO: finished nicht
+//TODO: Greifhaken geht zu weit runter
 class ShopView(
     context: Context,
     val shopItems: List<Item>,
-    private val playerCoin: Int,
+    private var playerCoin: Int,
     private val player: Character,
     val handlePlayerBuy: KFunction1<Item, Unit>,
     val handlePlayerItemReservation: KFunction1<Item, Unit>,
@@ -320,6 +323,7 @@ class ShopView(
         hook.shouldBounce = true
         itemsBoughtIndexList.add(itemIndex.roundToInt())
         handlePlayerBuy(shopItems[itemIndex.roundToInt()])
+        playerCoin -= shopItems[itemIndex.roundToInt()].cost
     }
 
     private fun handleReserve() {
@@ -330,7 +334,7 @@ class ShopView(
             firstItemEndPosition.bottom
         )
         val screenWidth = size.widthPixels
-        val itemIndex = ((hook.currentPosition.left - screenWidth / 20) / (screenWidth / 10))
+        val itemIndex = ((hook.currentPosition.left - screenWidth/20) / (screenWidth/5))
         handlePlayerItemReservation(shopItems[itemIndex.roundToInt()])
     }
 
@@ -356,8 +360,6 @@ class ShopView(
         )
     }
 
-    //TODO: U can still click on an Item, if it is not there anymore
-    //TODO: Ich can Items kaufen, obwohl ich nicht das Geld dazu habe ^^'
     override fun onTouchEvent(motionEvent: MotionEvent): Boolean {
         when (motionEvent.action and MotionEvent.ACTION_MASK) {
 
