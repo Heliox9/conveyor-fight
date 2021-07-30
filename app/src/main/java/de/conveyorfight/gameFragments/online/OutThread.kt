@@ -6,6 +6,13 @@ import java.util.*
 class OutThread(val writer: PrintWriter) : Thread() {
 
     private val outgoing = LinkedList<String>()
+    var continueRunning = true
+
+    fun shutdown() {
+        outgoing.clear()
+        writer.close()
+        continueRunning = false
+    }
 
     /**
      * push message to outgoing queue
@@ -21,7 +28,7 @@ class OutThread(val writer: PrintWriter) : Thread() {
 
 
     override fun run() {
-        while (true) {
+        while (continueRunning) {
             if (outgoing.size > 0) sendToServer(outgoing.poll())
         }
     }

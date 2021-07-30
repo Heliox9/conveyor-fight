@@ -78,7 +78,7 @@ class OnlineGameFragment : GeneralGameInterface() {
 
     override fun customHandleGameEnd() {
         println("custom game end")
-        TODO("Not yet implemented")
+        thread.shutdown()
     }
 
 

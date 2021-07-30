@@ -51,6 +51,16 @@ class ClientThread(val userName: String) : Thread() {
         return read
     }
 
+    var continueRunning = true
+
+    fun shutdown() {
+        outThread.shutdown()
+        input.close()
+        incoming.clear()
+        continueRunning = false
+
+    }
+
     /**
      * executes handshake and loops to server the queues
      */
@@ -76,7 +86,7 @@ class ClientThread(val userName: String) : Thread() {
 
 
         // always up loop to send and receive messages
-        while (true) {
+        while (continueRunning) {
             appendIncoming(readFromServer())
         }
     }
