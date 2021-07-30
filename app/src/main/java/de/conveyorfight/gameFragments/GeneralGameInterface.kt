@@ -5,15 +5,20 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ViewSwitcher
 import androidx.fragment.app.Fragment
+import androidx.navigation.Navigation
+import de.conveyorfight.R
 import de.conveyorfight.assets.Character
 import de.conveyorfight.assets.Item
 import de.conveyorfight.fight.FightView
 import de.conveyorfight.shop.ShopView
+import kotlin.reflect.KFunction0
 
 abstract class GeneralGameInterface: Fragment(){
 
     var round: Int = 1
+    var switcher: ViewSwitcher? = null
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -21,34 +26,51 @@ abstract class GeneralGameInterface: Fragment(){
         savedInstanceState: Bundle?
     ): View? {
         super.onCreate(savedInstanceState)
-
+        //TODO: unter Umständen mache eine Rebootfunktion für die ShopView
+        /*switcher = ViewSwitcher(requireContext())
+        switcher!!.addView(getFightView())
+        switcher!!.addView(getShopView())
+        return switcher!!.currentView */
         return getShopView()
     }
 
-    fun getShopView (): ShopView {
+    private fun switchView() {
+        switcher!!.showNext()
+    }
+
+    private fun getShopView (): ShopView {
         return ShopView(requireContext(),
             getShopItems(),
             getPlayerCoin(),
             getPlayerItems(),
             ::handlePlayerBuy,
             ::handlePlayerItemReservation,
-            ::handlePlayerUnreserveItem)
-        //TODO: round iteration
+            ::handlePlayerUnreserveItem,
+            ::switchView
+        )
     }
 
-    fun runFightView () {
-        FightView(requireContext(),
+    private fun getFightView (): FightView {
+        round++
+        return FightView(requireContext(),
             isPlayerFirst(),
             getPlayerItems(),
             getPlayerAfterDamage(),
             getEnemyItems(),
             getEnemyAfterDamage(),
             ::handleWin,
-            ::handleLoose
+            ::handleLoose,
+            ::handleGameEnd,
+            ::switchView
         )
-        round++
-        //TODO: loose/win sollten danach wieder auf menu verweisen
     }
+
+    private fun handleGameEnd () {
+        customHandleGameEnd()
+        Navigation.findNavController(requireView()).navigate(R.id.menuFragment)
+    }
+
+    abstract fun customHandleGameEnd ()
 
     abstract fun getPlayerAfterDamage(): Character
 
