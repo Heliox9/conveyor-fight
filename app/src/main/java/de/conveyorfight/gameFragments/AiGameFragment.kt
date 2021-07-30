@@ -107,6 +107,10 @@ class AiGameFragment() : GeneralGameInterface() {
         //for the ai there is nothing to do here
     }
 
+    override fun handleShopFinished() {
+        TODO("Not yet implemented")
+    }
+
     override fun customHandleGameEnd() {
         //for the ai there is nothing to do here
     }

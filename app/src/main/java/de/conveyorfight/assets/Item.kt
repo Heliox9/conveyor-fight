@@ -3,17 +3,14 @@ package de.conveyorfight.assets
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
-import com.google.gson.GsonBuilder
-import com.google.gson.JsonDeserializationContext
-import com.google.gson.JsonDeserializer
-import com.google.gson.JsonElement
+import com.google.gson.*
 import de.conveyorfight.R
 import java.lang.reflect.Type
 import java.util.*
 import kotlin.collections.ArrayList
 
 class Item(
-    val context: Context,
+    private val context: Context,
     val round: Int,
     var rarity: Int = -1,
     var itemType: ItemTypes? = null,
@@ -21,6 +18,10 @@ class Item(
     var properties: ArrayList<PropertyValue> = ArrayList<PropertyValue>(),
     var uuid: UUID? = null
 ) {
+
+    public fun getContext(): Context {
+        return context
+    }
 
     lateinit var bitmap: Bitmap
 
@@ -250,5 +251,40 @@ class Item(
                 gson.fromJson(jsonObject.get("uuid"), UUID::class.java)
             );
         }
+    }
+
+    class Serializer() : JsonSerializer<Item> {
+        /**
+         * Gson invokes this call-back method during serialization when it encounters a field of the
+         * specified type.
+         *
+         *
+         * In the implementation of this call-back method, you should consider invoking
+         * [JsonSerializationContext.serialize] method to create JsonElements for any
+         * non-trivial field of the `src` object. However, you should never invoke it on the
+         * `src` object itself since that will cause an infinite loop (Gson will call your
+         * call-back method again).
+         *
+         * @param src the object that needs to be converted to Json.
+         * @param typeOfSrc the actual type (fully genericized version) of the source object.
+         * @return a JsonElement corresponding to the specified object.
+         */
+        override fun serialize(
+            src: Item?,
+            typeOfSrc: Type?,
+            context: JsonSerializationContext?
+        ): JsonElement {
+            val gson = Gson()
+
+            val merchant = JsonObject()
+
+            if (src != null) {
+                merchant.add("uuid", gson.toJsonTree(src.uuid))
+            }
+
+            return merchant
+            TODO("Not yet implemented")
+        }
+
     }
 }

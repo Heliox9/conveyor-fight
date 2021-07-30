@@ -13,9 +13,8 @@ import de.conveyorfight.assets.Character
 import de.conveyorfight.assets.Item
 import de.conveyorfight.fight.FightView
 import de.conveyorfight.shop.ShopView
-import kotlin.reflect.KFunction0
 
-abstract class GeneralGameInterface: Fragment(){
+abstract class GeneralGameInterface : Fragment() {
 
     var round: Int = 1
     var switcher: ViewSwitcher? = null
@@ -38,8 +37,9 @@ abstract class GeneralGameInterface: Fragment(){
         switcher!!.showNext()
     }
 
-    private fun getShopView (): ShopView {
-        return ShopView(requireContext(),
+    private fun getShopView(): ShopView {
+        return ShopView(
+            requireContext(),
             getShopItems(),
             getPlayerCoin(),
             getPlayerItems(),
@@ -50,9 +50,10 @@ abstract class GeneralGameInterface: Fragment(){
         )
     }
 
-    private fun getFightView (): FightView {
+    private fun getFightView(): FightView {
         round++
-        return FightView(requireContext(),
+        return FightView(
+            requireContext(),
             isPlayerFirst(),
             getPlayerItems(),
             getPlayerAfterDamage(),
@@ -65,12 +66,14 @@ abstract class GeneralGameInterface: Fragment(){
         )
     }
 
-    private fun handleGameEnd () {
+    private fun handleGameEnd() {
         customHandleGameEnd()
         Navigation.findNavController(requireView()).navigate(R.id.menuFragment)
     }
 
-    abstract fun customHandleGameEnd ()
+    abstract fun handleShopFinished()
+
+    abstract fun customHandleGameEnd()
 
     abstract fun getPlayerAfterDamage(): Character
 

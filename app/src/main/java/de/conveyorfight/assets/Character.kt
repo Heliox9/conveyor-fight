@@ -1,9 +1,6 @@
 package de.conveyorfight.assets
 
-import android.content.Context
-import android.graphics.BitmapFactory
-import de.conveyorfight.R
-import java.util.ArrayList
+import java.util.*
 import kotlin.math.min
 import kotlin.random.Random
 
@@ -19,8 +16,8 @@ class Character(
     var propertiesKnown: ArrayList<Properties> = ArrayList<Properties>()
 ) {
 
-    fun add(item: Item){
-        when(item.itemType){
+    fun add(item: Item) {
+        when (item.itemType) {
             ItemTypes.Helmet -> helmet = item
             ItemTypes.Gloves -> gloves = item
             ItemTypes.Armor -> armor = item
@@ -126,7 +123,7 @@ class Character(
             }
         }
         val itemToUpgrade = probableItems.random()
-        add(Item(itemToUpgrade.context, itemToUpgrade.round, (itemToUpgrade.rarity + 1)))
+        add(Item(itemToUpgrade.getContext(), itemToUpgrade.round, (itemToUpgrade.rarity + 1)))
     }
 
     fun isUpgradeAble(): Boolean {

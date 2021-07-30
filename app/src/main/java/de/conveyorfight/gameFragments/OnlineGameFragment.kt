@@ -34,7 +34,9 @@ class OnlineGameFragment : GeneralGameInterface() {
         // setup gson to convert from/to json
         val gsonBuilder = GsonBuilder()
         gsonBuilder.registerTypeAdapter(Item::class.java, Item.Deserializer(requireContext()))
+        gsonBuilder.registerTypeAdapter(Item::class.java, Item.Serializer())
         gsonBuilder.registerTypeAdapter(PropertyValue::class.java, PropertyValue.Deserializer())
+
         gson = gsonBuilder.create()
 
         thread = ClientThread()
@@ -46,6 +48,17 @@ class OnlineGameFragment : GeneralGameInterface() {
         // after this point round iteration begins
 
         return super.onCreateView(inflater, container, savedInstanceState)
+    }
+
+    override fun handleShopFinished() {
+        val json = gson.toJson(itemSelection)
+        println("json: $json")
+        thread.addOutgoing(json)
+    }
+
+    override fun customHandleGameEnd() {
+        println("custom game end")
+        TODO("Not yet implemented")
     }
 
 
@@ -112,10 +125,10 @@ class OnlineGameFragment : GeneralGameInterface() {
     /**
      * add item to buy list and send selection over socket
      */
-    override fun handlePlayerBuy(item: Item) {
+    override fun handlePlayerBuy(toBuy: Item) {
         println("handlePlayerBuy")
-        itemSelection.bought.add(item)
-        thread.addOutgoing(gson.toJson(itemSelection))
+        itemSelection.bought.add(toBuy)
+        println("bought added: $itemSelection")
     }
 
     /**
