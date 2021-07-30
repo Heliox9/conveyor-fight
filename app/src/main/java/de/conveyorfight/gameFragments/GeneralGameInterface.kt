@@ -5,7 +5,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ViewSwitcher
+import android.widget.ViewAnimator
 import androidx.fragment.app.Fragment
 import androidx.navigation.Navigation
 import de.conveyorfight.R
@@ -13,11 +13,16 @@ import de.conveyorfight.assets.Character
 import de.conveyorfight.assets.Item
 import de.conveyorfight.fight.FightView
 import de.conveyorfight.shop.ShopView
+import java.util.*
+import kotlin.concurrent.timerTask
+
 
 abstract class GeneralGameInterface : Fragment() {
 
     var round: Int = 1
-    var switcher: ViewSwitcher? = null
+    var switcher: ViewAnimator? = null
+    var timer: Timer = Timer()
+    var isShopView = true
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -26,15 +31,36 @@ abstract class GeneralGameInterface : Fragment() {
     ): View? {
         super.onCreate(savedInstanceState)
         //TODO: unter Umständen mache eine Rebootfunktion für die ShopView
-        /*switcher = ViewSwitcher(requireContext())
-        switcher!!.addView(getFightView())
+
+        switcher = ViewAnimator(requireContext())
         switcher!!.addView(getShopView())
-        return switcher!!.currentView */
-        return getShopView()
+        createTimer(30000)
+        return switcher!!
     }
 
     private fun switchView() {
-        switcher!!.showNext()
+        if (isShopView) {
+            val fightView = getFightView()
+            switcher!!.removeAllViews()
+            switcher!!.addView(fightView)
+            switcher!!.showNext()
+            fightView.start()
+            isShopView = false
+            createTimer(10000)
+        } else {
+            switcher!!.addView(getShopView())
+            switcher!!.showNext()
+            isShopView = true
+            createTimer(30000)
+        }
+    }
+
+    fun createTimer(delay: Long) {
+        timer.schedule(timerTask {
+            activity?.runOnUiThread {
+                switchView()
+            }
+        }, delay)
     }
 
     private fun getShopView(): ShopView {
@@ -46,7 +72,7 @@ abstract class GeneralGameInterface : Fragment() {
             ::handlePlayerBuy,
             ::handlePlayerItemReservation,
             ::handlePlayerUnreserveItem,
-            ::switchView
+            ::handleShopFinished,
         )
     }
 
@@ -59,10 +85,8 @@ abstract class GeneralGameInterface : Fragment() {
             getPlayerAfterDamage(),
             getEnemyItems(),
             getEnemyAfterDamage(),
-            ::handleWin,
-            ::handleLoose,
             ::handleGameEnd,
-            ::switchView
+            ::handleRoundEnd
         )
     }
 
@@ -82,11 +106,6 @@ abstract class GeneralGameInterface : Fragment() {
     abstract fun isPlayerFirst(): Boolean
 
     abstract fun getPlayerCoin(): Int
-
-
-    abstract fun handleWin()
-
-    abstract fun handleLoose()
 
     abstract fun getPlayerItems(): Character
 

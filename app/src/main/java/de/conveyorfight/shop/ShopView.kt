@@ -10,8 +10,7 @@ import de.conveyorfight.assets.Character
 import de.conveyorfight.assets.Conveyor
 import de.conveyorfight.assets.GrapplingHook
 import de.conveyorfight.assets.Item
-import java.util.ArrayList
-import kotlin.concurrent.thread
+import java.util.*
 import kotlin.math.ceil
 import kotlin.math.roundToInt
 import kotlin.reflect.KFunction0
@@ -29,9 +28,8 @@ class ShopView(
     val handlePlayerBuy: KFunction1<Item, Unit>,
     val handlePlayerItemReservation: KFunction1<Item, Unit>,
     val handlePlayerUnreserveItem: KFunction0<Unit>,
-    private val flipView: () -> Unit
-)
-    : SurfaceView(context), Runnable{
+    val handleShopFinished: KFunction0<Unit>
+) : SurfaceView(context), Runnable {
 
     private var rightArrowPosition: RectF
     private var leftArrowPosition: RectF
@@ -46,12 +44,13 @@ class ShopView(
     private val conveyor: Conveyor
     private var background: Bitmap = BitmapFactory.decodeResource(
         context.resources,
-        R.drawable.background_wall)
+        R.drawable.background_wall
+    )
 
 
     private val firstItemCurrentPosition: RectF
     private val firstItemEndPosition: RectF
-    private var itemInSpeed = 150f
+    private var itemInSpeed = 250f
     private val itemsBoughtIndexList = ArrayList<Int>()
 
     private val gameThread = Thread(this)
@@ -73,12 +72,12 @@ class ShopView(
         val screenHeight: Float = size.heightPixels.toFloat()
 
         firstItemEndPosition = RectF(
-            screenWidth/20,
-            (conveyor.position.top) - screenWidth/10,
-            (screenWidth/20) + screenWidth/10,
+            screenWidth / 20,
+            (conveyor.position.top) - screenWidth / 10,
+            (screenWidth / 20) + screenWidth / 10,
             conveyor.position.top
         )
-        println("item:" + screenWidth/20)
+        println("item:" + screenWidth / 20)
         firstItemCurrentPosition = RectF(
             firstItemEndPosition.left - (screenWidth),
             firstItemEndPosition.top,
@@ -87,27 +86,27 @@ class ShopView(
         )
         leftArrowPosition = RectF(
             screenWidth / 20,
-            screenHeight/40,
-            screenWidth / 20 + screenWidth/7,
-            screenHeight/15
+            screenHeight / 40,
+            screenWidth / 20 + screenWidth / 7,
+            screenHeight / 15
         )
         rightArrowPosition = RectF(
-            screenWidth - (screenWidth / 20 + screenWidth/7 ) ,
-            screenHeight/40,
+            screenWidth - (screenWidth / 20 + screenWidth / 7),
+            screenHeight / 40,
             screenWidth - screenWidth / 20,
-            screenHeight/15
+            screenHeight / 15
         )
         buyButton = RectF(
-            screenWidth/8 ,
-            screenHeight*35/40,
+            screenWidth / 8,
+            screenHeight * 35 / 40,
             screenWidth * 3 / 8,
-            screenHeight*39/40
+            screenHeight * 39 / 40
         )
         reserveButton = RectF(
-            screenWidth*5/8 ,
-            screenHeight*35/40,
+            screenWidth * 5 / 8,
+            screenHeight * 35 / 40,
             screenWidth * 7 / 8,
-            screenHeight*39/40
+            screenHeight * 39 / 40
         )
         gameThread.start()
     }
@@ -120,8 +119,8 @@ class ShopView(
         while (true) {
             val startFrameTime = System.currentTimeMillis()
 
-            if(firstItemCurrentPosition.left < firstItemEndPosition.left){
-                if ((startFrameTime - lastConveyorChange) > 1000){
+            if (firstItemCurrentPosition.left < firstItemEndPosition.left) {
+                if ((startFrameTime - lastConveyorChange) > 1000) {
                     conveyor.isFirstPicture = !conveyor.isFirstPicture
                     lastConveyorChange = startFrameTime
                 }
@@ -137,18 +136,24 @@ class ShopView(
                 fps = 1000 / timeThisFrame
             }
 
-            if(System.currentTimeMillis() - startTime >= 30000){
+            if (System.currentTimeMillis() - startTime >= 29000) {
                 println("times over")
-                flipView()
+                handleShopFinished()
                 break
             }
         }
     }
 
     private fun update(fps: Long) {
-        if(firstItemCurrentPosition.left < firstItemEndPosition.left){
-            firstItemCurrentPosition.left = minOf(firstItemEndPosition.left, (firstItemCurrentPosition.left+itemInSpeed/fps))
-            firstItemCurrentPosition.right = minOf(firstItemEndPosition.right, (firstItemCurrentPosition.right+itemInSpeed/fps))
+        if (firstItemCurrentPosition.left < firstItemEndPosition.left) {
+            firstItemCurrentPosition.left = minOf(
+                firstItemEndPosition.left,
+                (firstItemCurrentPosition.left + itemInSpeed / fps)
+            )
+            firstItemCurrentPosition.right = minOf(
+                firstItemEndPosition.right,
+                (firstItemCurrentPosition.right + itemInSpeed / fps)
+            )
         }
 
         hook.update(fps)
@@ -162,13 +167,13 @@ class ShopView(
         canvas.drawBitmap(conveyor.getConveyor(), null, conveyor.position, null)
 
         val screenHeight: Float = size.heightPixels.toFloat()
-        val textSize = screenHeight/20
+        val textSize = screenHeight / 20
         paint.textSize = textSize
 
         drawItems(textSize)
         drawCoins(textSize)
 
-        if(hook.currentPosition == hook.endPosition){
+        if (hook.currentPosition == hook.endPosition) {
             drawButtons(textSize)
         }
 
@@ -182,39 +187,40 @@ class ShopView(
         paint.color = Color.argb(255, 240, 0, 0)
 
         //left Arrow Dringed ersetzen durch gemalte Pfeile!
-        if (hook.currentPosition.left > screenWidth / 20){
-            canvas.drawRect(leftArrowPosition , paint)
+        if (hook.currentPosition.left > screenWidth / 20) {
+            canvas.drawRect(leftArrowPosition, paint)
         }
 
         //rightArrow
-        if (hook.currentPosition.right < screenWidth - screenWidth / 20){
-            canvas.drawRect( rightArrowPosition, paint)
+        if (hook.currentPosition.right < screenWidth - screenWidth / 20) {
+            canvas.drawRect(rightArrowPosition, paint)
         }
 
         canvas.drawRect(buyButton, paint)
         paint.color = Color.argb(255, 255, 255, 255)
-        canvas.drawText("Buy", buyButton.left + 10, buyButton.bottom - textSize/2, paint)
+        canvas.drawText("Buy", buyButton.left + 10, buyButton.bottom - textSize / 2, paint)
 
         paint.color = Color.argb(255, 255, 0, 0)
         canvas.drawRect(reserveButton, paint)
         paint.color = Color.argb(255, 255, 255, 255)
-        val text = if(hook.endPosition.bottom > screenHeight/2) "Unreserve" else "Reserve"
-        canvas.drawText(text, reserveButton.left + 10, reserveButton.bottom - textSize/2, paint)
+        val text = if (hook.endPosition.bottom > screenHeight / 2) "Unreserve" else "Reserve"
+        canvas.drawText(text, reserveButton.left + 10, reserveButton.bottom - textSize / 2, paint)
     }
 
     private fun drawCoins(textSize: Float) {
         val screenHeight = size.heightPixels.toFloat()
         val screenWidth = size.widthPixels.toFloat()
-        val screenHalf = screenWidth/2
+        val screenHalf = screenWidth / 2
 
-        val ovalPosition = RectF (
-            screenHalf - (screenWidth/20),
+        val ovalPosition = RectF(
+            screenHalf - (screenWidth / 20),
             (screenHeight - (textSize * 1.5)).toFloat(),
-            screenHalf + (screenWidth/20),
-            (screenHeight - (textSize * 0.5)).toFloat())
+            screenHalf + (screenWidth / 20),
+            (screenHeight - (textSize * 0.5)).toFloat()
+        )
 
         paint.color = Color.argb(255, 240, 240, 40)
-        canvas.drawOval( ovalPosition, paint)
+        canvas.drawOval(ovalPosition, paint)
 
         val textPaint = Paint()
         textPaint.textAlign = Paint.Align.CENTER
@@ -232,7 +238,7 @@ class ShopView(
         val screenWidth: Float = size.widthPixels.toFloat()
         var i = 0
         while (i < shopItems.size) {
-            if(!itemsBoughtIndexList.contains(i)) {
+            if (!itemsBoughtIndexList.contains(i)) {
                 val currentItemPosition = RectF(
                     firstItemCurrentPosition.left + (screenWidth / 5) * i,
                     firstItemCurrentPosition.top,
@@ -278,7 +284,7 @@ class ShopView(
         }
     }
 
-    private fun createBackgroundBitmap () {
+    private fun createBackgroundBitmap() {
         val screenWidth: Double = size.widthPixels.toDouble()
         val screenHeight: Double = size.heightPixels.toDouble()
         val bitmapWidth: Double = background.width.toDouble()
@@ -286,9 +292,9 @@ class ShopView(
         val backgroundWidth: Int
         val backgroundHeight: Int
 
-        val heightRatio =  screenHeight/bitmapHeight
-        val widthRatio = screenWidth/bitmapWidth
-        if( widthRatio > heightRatio ){
+        val heightRatio = screenHeight / bitmapHeight
+        val widthRatio = screenWidth / bitmapWidth
+        if (widthRatio > heightRatio) {
             backgroundWidth = screenWidth.toInt()
             backgroundHeight = ceil(bitmapHeight * widthRatio).toInt()
         } else {
@@ -309,7 +315,8 @@ class ShopView(
             firstItemEndPosition.bottom
         )
         val screenWidth = size.widthPixels.toDouble()
-        val itemIndex = ((hook.currentPosition.left.toDouble() - screenWidth/20) / (screenWidth/5))
+        val itemIndex =
+            ((hook.currentPosition.left.toDouble() - screenWidth / 20) / (screenWidth / 5))
         hook.shouldBounce = true
         itemsBoughtIndexList.add(itemIndex.roundToInt())
         handlePlayerBuy(shopItems[itemIndex.roundToInt()])
@@ -317,13 +324,13 @@ class ShopView(
 
     private fun handleReserve() {
         hook.endPosition = RectF(
-           hook.currentPosition.left,
-           firstItemEndPosition.bottom - hook.hook.height,
-           hook.currentPosition.right,
-           firstItemEndPosition.bottom
+            hook.currentPosition.left,
+            firstItemEndPosition.bottom - hook.hook.height,
+            hook.currentPosition.right,
+            firstItemEndPosition.bottom
         )
         val screenWidth = size.widthPixels
-        val itemIndex = ((hook.currentPosition.left - screenWidth/20) / (screenWidth/10))
+        val itemIndex = ((hook.currentPosition.left - screenWidth / 20) / (screenWidth / 10))
         handlePlayerItemReservation(shopItems[itemIndex.roundToInt()])
     }
 
@@ -331,20 +338,20 @@ class ShopView(
         val screenHeight = size.heightPixels
         hook.endPosition = RectF(
             hook.currentPosition.left,
-            ((screenHeight/ 4) - hook.hook.height).toFloat(),
+            ((screenHeight / 4) - hook.hook.height).toFloat(),
             hook.currentPosition.right,
-            (screenHeight/ 4).toFloat()
+            (screenHeight / 4).toFloat()
         )
         handlePlayerUnreserveItem()
     }
 
     private fun handleMoving(isMovingToTheRight: Boolean) {
         val screenWidth = size.widthPixels
-        val deltaX = screenWidth/5
+        val deltaX = screenWidth / 5
         hook.endPosition = RectF(
-            if(isMovingToTheRight) hook.currentPosition.left + deltaX else hook.currentPosition.left - deltaX,
+            if (isMovingToTheRight) hook.currentPosition.left + deltaX else hook.currentPosition.left - deltaX,
             hook.currentPosition.top,
-            if(isMovingToTheRight) hook.currentPosition.right + deltaX else hook.currentPosition.right - deltaX,
+            if (isMovingToTheRight) hook.currentPosition.right + deltaX else hook.currentPosition.right - deltaX,
             hook.currentPosition.bottom
         )
     }
@@ -357,12 +364,12 @@ class ShopView(
             // Player has touched the screen
             // Or moved their finger while touching screen
             MotionEvent.ACTION_POINTER_DOWN,
-            MotionEvent.ACTION_DOWN-> {
+            MotionEvent.ACTION_DOWN -> {
                 val screenWidth = size.widthPixels
                 val screenHeight = size.heightPixels
-                if(hook.currentPosition == hook.endPosition) {
+                if (hook.currentPosition == hook.endPosition) {
                     if (hook.currentPosition.left > screenWidth / 20) {
-                        if(handlePossibleClick(leftArrowPosition, motionEvent)){
+                        if (handlePossibleClick(leftArrowPosition, motionEvent)) {
                             handleMoving(false)
                             return true
                         }
@@ -370,19 +377,19 @@ class ShopView(
 
                     //rightArrow
                     if (hook.currentPosition.right < screenWidth - screenWidth / 20) {
-                        if(handlePossibleClick(rightArrowPosition, motionEvent)){
+                        if (handlePossibleClick(rightArrowPosition, motionEvent)) {
                             handleMoving(true)
                             return true
                         }
                     }
 
-                    if(handlePossibleClick(buyButton, motionEvent)){
+                    if (handlePossibleClick(buyButton, motionEvent)) {
                         handleBuy()
                         return true
                     }
 
-                    if(handlePossibleClick(reserveButton, motionEvent)){
-                        return if(hook.endPosition.bottom > screenHeight/2)  {
+                    if (handlePossibleClick(reserveButton, motionEvent)) {
+                        return if (hook.endPosition.bottom > screenHeight / 2) {
                             handleUnreserve()
                             true
                         } else {
@@ -397,9 +404,9 @@ class ShopView(
         return false
     }
 
-    private fun handlePossibleClick (positionObject: RectF, positionClick: MotionEvent): Boolean {
-        if(positionObject.left <= positionClick.x && positionObject.right > positionClick.x){
-            if(positionObject.top <= positionClick.y && positionObject.bottom > positionClick.y){
+    private fun handlePossibleClick(positionObject: RectF, positionClick: MotionEvent): Boolean {
+        if (positionObject.left <= positionClick.x && positionObject.right > positionClick.x) {
+            if (positionObject.top <= positionClick.y && positionObject.bottom > positionClick.y) {
                 return true
             }
         }

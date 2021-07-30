@@ -23,7 +23,7 @@ class OnlineGameFragment : GeneralGameInterface() {
     private lateinit var thread: ClientThread
     private var stateBeforeDamage: GameState? = null
     private var stateAfterDamage: GameState? = null
-    private var first: Boolean? = null
+    private var first: Boolean = true
 
     private lateinit var character: Character
     private var money: Int = -42
@@ -56,6 +56,8 @@ class OnlineGameFragment : GeneralGameInterface() {
     }
 
     override fun handleShopFinished() {
+        println("\n\nhandle shop finished\n\n")
+
         val json = gson.toJson(itemSelection)
         println("json: $json")
         thread.addOutgoing(json)
@@ -84,7 +86,7 @@ class OnlineGameFragment : GeneralGameInterface() {
 
     override fun isPlayerFirst(): Boolean {
         println("isPlayerFirst")
-        return first!!
+        return first
     }
 
     /**
@@ -96,16 +98,6 @@ class OnlineGameFragment : GeneralGameInterface() {
         return money
     }
 
-
-    override fun handleWin() {
-        println("handleWin")
-        TODO("Not yet implemented")
-    }
-
-    override fun handleLoose() {
-        println("handleLoose")
-        TODO("Not yet implemented")
-    }
 
     /**
      * read character sheet from socket
@@ -169,6 +161,5 @@ class OnlineGameFragment : GeneralGameInterface() {
         println("handleRoundEnd")
         stateBeforeDamage = null
         stateAfterDamage = null
-        first = null
     }
 }
