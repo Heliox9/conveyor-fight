@@ -3,10 +3,10 @@ package de.conveyorfight.gameFragments.online
 import java.io.PrintWriter
 import java.util.*
 
-class OutThread(val writer: PrintWriter) : Thread() {
+class OutThread(private val writer: PrintWriter) : Thread() {
 
     private val outgoing = LinkedList<String>()
-    var continueRunning = true
+    private var continueRunning = true
 
     fun shutdown() {
         outgoing.clear()

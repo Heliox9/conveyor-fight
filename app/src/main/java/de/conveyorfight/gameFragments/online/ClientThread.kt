@@ -6,7 +6,8 @@ import java.io.PrintWriter
 import java.net.Socket
 import java.util.*
 
-class ClientThread(val userName: String, val ip: String, val port: Int) : Thread() {
+class ClientThread(private val userName: String, private val ip: String, private val port: Int) :
+    Thread() {
     private lateinit var socket: Socket
     private lateinit var input: BufferedReader
     private val incoming = LinkedList<String>()
@@ -51,7 +52,7 @@ class ClientThread(val userName: String, val ip: String, val port: Int) : Thread
         return read
     }
 
-    var continueRunning = true
+    private var continueRunning = true
 
     /**
      * gracefully shutdown all resources including the output thread
@@ -79,7 +80,7 @@ class ClientThread(val userName: String, val ip: String, val port: Int) : Thread
         } catch (e: Exception) {
             e.printStackTrace()
             println("You might want to try setting the ip and port for the server in online.xml")
-            error("Error occured while creating the connection to the server")
+            error("Error occurred while creating the connection to the server")
         }
 
         outThread = OutThread(output)

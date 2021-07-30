@@ -115,7 +115,7 @@ class OnlineGameFragment : GeneralGameInterface() {
     override fun getPlayerItems(): Character {
         println("getPlayerItems")
         if (stateBeforeDamage != null) {
-            println("returning character from gamestate")
+            println("returning character from game state")
             return stateBeforeDamage!!.player
         }
 
@@ -126,7 +126,7 @@ class OnlineGameFragment : GeneralGameInterface() {
 
     override fun getEnemyItems(): Character {
         println("getEnemyItems")
-        println("returning character from gamestate")
+        println("returning character from game state")
         return stateBeforeDamage!!.opponent
     }
 
@@ -151,7 +151,7 @@ class OnlineGameFragment : GeneralGameInterface() {
      * clear saved list
      */
     override fun handlePlayerUnreserveItem() {
-        println("handlePlayerUnreserveItem")
+        println("handlePlayerUndoReserveItem")
         itemSelection.saved.clear()
     }
 
