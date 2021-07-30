@@ -106,7 +106,6 @@ class FightView(
         drawCharacter(playerCharacter, true)
         drawCharacter(enemyCharacter, false)
         drawItems()
-        handleWin()
 
         holder.unlockCanvasAndPost(canvas)
 
