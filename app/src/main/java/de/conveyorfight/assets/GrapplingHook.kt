@@ -9,7 +9,6 @@ import android.util.DisplayMetrics
 import de.conveyorfight.R
 import kotlin.math.roundToInt
 
-//TODO: Kette zu kurz
 class GrapplingHook(context: Context, private val size: DisplayMetrics) {
     var hook: Bitmap = BitmapFactory.decodeResource(
         context.resources,
@@ -32,12 +31,15 @@ class GrapplingHook(context: Context, private val size: DisplayMetrics) {
     init {
         val screenWidth: Double = size.widthPixels.toDouble()
         val screenHeight: Double = size.heightPixels.toDouble()
+        
         val bitmapWidth: Double = hook.width.toDouble()
         val bitmapHeight: Double = hook.height.toDouble()
 
         val hookWidth = screenWidth/7
         val ratio = hookWidth/ bitmapWidth
+
         val hookHeight =  bitmapHeight * ratio
+        val movingHookHeight = hookMoving.height.toDouble() * ratio
 
         hook = Bitmap.createScaledBitmap(hook,
             hookWidth.roundToInt(),
@@ -46,7 +48,7 @@ class GrapplingHook(context: Context, private val size: DisplayMetrics) {
 
         hookMoving = Bitmap.createScaledBitmap(hookMoving,
             hookWidth.roundToInt(),
-            hookHeight.roundToInt(),
+            movingHookHeight.roundToInt(),
             false)
 
         currentHook = hook
@@ -56,13 +58,12 @@ class GrapplingHook(context: Context, private val size: DisplayMetrics) {
             ((screenHeight/ 4) - hookHeight).toFloat(),
             ((screenWidth/20)+hookWidth).toFloat(),
             (screenHeight/ 4).toFloat())
-        println("item:" + (screenWidth/20).toFloat())
 
         endPosition = currentPosition
     }
 
     fun update(fps: Long){
-        when {
+        when { //TODO HOOK!!!elf
             currentPosition.left - endPosition.left > 0 -> {
                 currentPosition.left = maxOf(endPosition.left, (currentPosition.left - speed/fps))
                 currentPosition.right = maxOf(endPosition.right, (currentPosition.right - speed/fps))

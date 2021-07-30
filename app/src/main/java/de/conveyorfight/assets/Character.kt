@@ -1,10 +1,6 @@
 package de.conveyorfight.assets
 
-import android.content.Context
-import android.graphics.BitmapFactory
-import de.conveyorfight.R
 import java.util.ArrayList
-import kotlin.math.min
 import kotlin.random.Random
 
 class Character(var hp: Int = 100,
@@ -15,7 +11,7 @@ class Character(var hp: Int = 100,
                 var shoes: Item? =null,
                 var special: Item? =null,
                 var weapon: Item? =null,
-                var propertiesKnown: ArrayList<Properties> = ArrayList<Properties>()) {
+                var propertiesKnown: ArrayList<Properties> = ArrayList<Properties>()): Cloneable {
 
     fun add(item: Item){
         when(item.itemType){
@@ -137,7 +133,7 @@ class Character(var hp: Int = 100,
         return false
     }
 
-    fun clone(): Character {
+    public override fun clone(): Character {
         return Character(hp, helmet?.clone(), gloves?.clone(), armor?.clone(), pants?.clone(),
             shoes?.clone(), special?.clone(), weapon?.clone(),
             propertiesKnown.clone() as ArrayList<Properties>)

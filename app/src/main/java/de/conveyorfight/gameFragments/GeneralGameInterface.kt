@@ -89,10 +89,8 @@ abstract class GeneralGameInterface: Fragment(){
     }
 
     private fun handleGameEnd () {
-        customHandleGameEnd()
-        println("in Navigation")
         timer.cancel()
-        Navigation.findNavController(requireView()).navigate(R.id.action_aiGameFragment_to_menuFragment)
+        customHandleGameEnd()
     }
 
     abstract fun customHandleGameEnd ()

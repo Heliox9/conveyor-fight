@@ -13,7 +13,7 @@ import java.util.*
 import kotlin.math.ceil
 
 
-//TODO: clonables maybe
+
 class FightView(
     context: Context,
     private val isPlayerFirst: Boolean,
@@ -66,7 +66,7 @@ class FightView(
         val defeatSource = ImageDecoder.createSource(context.assets, "defeat.gif")
         defeatGif = ImageDecoder.decodeDrawable(defeatSource) as AnimatedImageDrawable
 
-        textSize = (size.heightPixels/25).toFloat()
+        textSize = (size.heightPixels/30).toFloat()
     }
 
     fun start () {
@@ -94,7 +94,7 @@ class FightView(
         return Bitmap.createScaledBitmap(bitmap, backgroundWidth, backgroundHeight, true)
     }
 
-    private fun drawScene() { //TODO: refactor, make a setScene
+    private fun drawScene() {
         init()
 
         canvas = holder.lockCanvas()
@@ -219,37 +219,37 @@ class FightView(
         //items
         val screenWidth = size.widthPixels
         val spaceUnit = heightUnit.toFloat()
-        val firstRowTop = spaceUnit
-        val secondRowTop = spaceUnit * 3
-        val thirdRowTop = (firstRowTop + heightUnit).toFloat()
+        val firstRowTop = spaceUnit * 2
+        val secondRowTop = spaceUnit * 4
+        val thirdRowTop = spaceUnit * 3
 
         //helmet
         drawTile(playerCharacter.helmet, spaceUnit, firstRowTop, true)
         drawTile(enemyCharacter.helmet, screenWidth - (spaceUnit + heightUnit), firstRowTop, false)
 
         //armor
-        drawTile(playerCharacter.armor, 2 * spaceUnit, firstRowTop, true)
-        drawTile(enemyCharacter.armor, screenWidth - (2 * spaceUnit + heightUnit), firstRowTop, false)
+        drawTile(playerCharacter.armor, 3 * spaceUnit, firstRowTop, true)
+        drawTile(enemyCharacter.armor, screenWidth - (3 * spaceUnit + heightUnit), firstRowTop, false)
 
         //gloves
-        drawTile(playerCharacter.gloves, 3 * spaceUnit, firstRowTop, true)
-        drawTile(enemyCharacter.gloves, screenWidth - (3 * spaceUnit + heightUnit), firstRowTop, false)
+        drawTile(playerCharacter.gloves, 5 * spaceUnit, firstRowTop, true)
+        drawTile(enemyCharacter.gloves, screenWidth - (5 * spaceUnit + heightUnit), firstRowTop, false)
 
         //pants
         drawTile(playerCharacter.pants, spaceUnit, secondRowTop, true)
         drawTile(enemyCharacter.pants, screenWidth - (spaceUnit + heightUnit), secondRowTop, false)
 
         //shoes
-        drawTile(playerCharacter.shoes, 2 * spaceUnit, secondRowTop, true)
-        drawTile(enemyCharacter.shoes, screenWidth - (2 * spaceUnit + heightUnit), secondRowTop, false)
+        drawTile(playerCharacter.shoes, 3 * spaceUnit, secondRowTop, true)
+        drawTile(enemyCharacter.shoes, screenWidth - (3 * spaceUnit + heightUnit), secondRowTop, false)
 
         //special
-        drawTile(playerCharacter.special, 3 * spaceUnit, secondRowTop, true)
-        drawTile(enemyCharacter.special, screenWidth - (3 * spaceUnit + heightUnit), secondRowTop, false)
+        drawTile(playerCharacter.special, 5 * spaceUnit, secondRowTop, true)
+        drawTile(enemyCharacter.special, screenWidth - (5 * spaceUnit + heightUnit), secondRowTop, false)
 
         //weapon
-        drawTile(playerCharacter.weapon, 4 * spaceUnit, thirdRowTop, true)
-        drawTile(enemyCharacter.weapon, screenWidth - (4 * spaceUnit + heightUnit), thirdRowTop, false)
+        drawTile(playerCharacter.weapon, 7 * spaceUnit, thirdRowTop, true)
+        drawTile(enemyCharacter.weapon, screenWidth - (7 * spaceUnit + heightUnit), thirdRowTop, false)
 
     }
 
@@ -322,14 +322,11 @@ class FightView(
         canvas.drawBitmap(characterSplashScreen,0f, 0f, null)
     }
 
-    private fun handleWin() { //TODO
-        println("victory!")
+    private fun handleWin() {
         victoryGif
         victoryGif.start()
         victoryGif.draw(canvas)
-        println("draw victory")
         holder.unlockCanvasAndPost(canvas)
-        println("nach draw")
         handleGameEnd()
         Thread.sleep(5000)
     }

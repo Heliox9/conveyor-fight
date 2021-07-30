@@ -11,7 +11,7 @@ class Item(val context: Context,
            var rarity: Int = -1,
            var itemType:ItemTypes? = null,
            var cost: Int = 5,
-           var properties: ArrayList<PropertyValue> = ArrayList<PropertyValue>()) {
+           var properties: ArrayList<PropertyValue> = ArrayList<PropertyValue>()) : Cloneable{
 
     lateinit var bitmap: Bitmap
 
@@ -177,7 +177,7 @@ class Item(val context: Context,
         }
     }
 
-    fun clone(): Item {
+    public override fun clone(): Item {
         val item = Item(context, round, rarity, itemType, cost,
             properties.clone() as ArrayList<PropertyValue>)
         item.createBitmap()
