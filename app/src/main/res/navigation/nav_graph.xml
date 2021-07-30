@@ -6,33 +6,31 @@
     app:startDestination="@id/menuFragment">
 
     <fragment
-        android:id="@+id/fightFragment"
-        android:name="de.conveyorfight.fight.FightFragment"
-        android:label="fragment_fight"
-        tools:layout="@layout/fragment_fight">
-        <action
-            android:id="@+id/action_fightFragment_to_menuFragment"
-            app:destination="@id/menuFragment" />
-        <action
-            android:id="@+id/action_fightFragment_to_shopFragment"
-            app:destination="@id/shopFragment" />
-    </fragment>
-    <fragment
         android:id="@+id/menuFragment"
         android:name="de.conveyorfight.menu.MenuFragment"
         android:label="fragment_menu"
         tools:layout="@layout/fragment_menu">
         <action
-            android:id="@+id/action_menuFragment_to_fightFragment"
-            app:destination="@id/fightFragment" />
+            android:id="@+id/action_menuFragment_to_aiGameFragment"
+            app:destination="@id/aiGameFragment" />
+        <action
+            android:id="@+id/action_menuFragment_to_onlineGameFragment"
+            app:destination="@id/onlineGameFragment" />
     </fragment>
     <fragment
-        android:id="@+id/shopFragment"
-        android:name="de.conveyorfight.shop.ShopFragment"
-        android:label="fragment_shop"
-        tools:layout="@layout/fragment_shop" >
+        android:id="@+id/aiGameFragment"
+        android:name="de.conveyorfight.gameFragments.AiGameFragment"
+        android:label="fragment_ai_game">
         <action
-            android:id="@+id/action_shopFragment_to_fightFragment"
-            app:destination="@id/fightFragment" />
+            android:id="@+id/action_aiGameFragment_to_menuFragment"
+            app:destination="@id/menuFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/onlineGameFragment"
+        android:name="de.conveyorfight.gameFragments.OnlineGameFragment"
+        android:label="OnlineGameFragment" >
+        <action
+            android:id="@+id/action_onlineGameFragment_to_menuFragment"
+            app:destination="@id/menuFragment" />
     </fragment>
 </navigation>

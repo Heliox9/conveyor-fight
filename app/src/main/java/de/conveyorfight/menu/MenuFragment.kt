@@ -45,10 +45,13 @@ class MenuFragment : Fragment() {
         val view = inflater.inflate(R.layout.fragment_menu, container, false)
 
         // main navigation action
-        // TODO change to matchmaking logic
         view.findViewById<Button>(R.id.menu_play_button).setOnClickListener {
             NavHostFragment.findNavController(this)
-                .navigate(R.id.action_menuFragment_to_fightFragment)
+                .navigate(R.id.action_menuFragment_to_aiGameFragment)
+        }
+        view.findViewById<Button>(R.id.menu_play_online_button).setOnClickListener {
+            NavHostFragment.findNavController(this)
+                .navigate(R.id.action_menuFragment_to_onlineGameFragment)
         }
 
         // Volume bar visibility toggles
