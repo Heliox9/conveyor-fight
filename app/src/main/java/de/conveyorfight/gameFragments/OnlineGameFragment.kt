@@ -20,7 +20,7 @@ import java.util.*
 class OnlineGameFragment : GeneralGameInterface() {
     private val name = UUID.randomUUID().toString() // random name for the player to reference
     private lateinit var gson: Gson
-    private lateinit var thread: ClientThread
+    private var thread: ClientThread? = null
     private var stateBeforeDamage: GameState? = null
     private var stateAfterDamage: GameState? = null
     private var first: Boolean = true
@@ -53,7 +53,7 @@ class OnlineGameFragment : GeneralGameInterface() {
         gson = gsonBuilder.create()
 
         thread = ClientThread(name)
-        thread.start()
+        thread!!.start()
 
         // wait for thread to initialize
         Thread.sleep(100)
@@ -68,17 +68,18 @@ class OnlineGameFragment : GeneralGameInterface() {
 
         val json = gson.toJson(itemSelection)
         println("json: $json")
-        thread.addOutgoing(json)
+        thread?.addOutgoing(json)
 
         // read game state
-        stateBeforeDamage = gson.fromJson(thread.getNextIncoming(), GameState::class.java)
-        stateAfterDamage = gson.fromJson(thread.getNextIncoming(), GameState::class.java)
-        first = gson.fromJson(thread.getNextIncoming(), Boolean::class.java)
+        stateBeforeDamage = gson.fromJson(thread?.getNextIncoming(), GameState::class.java)
+        stateAfterDamage = gson.fromJson(thread?.getNextIncoming(), GameState::class.java)
+        first = gson.fromJson(thread?.getNextIncoming(), Boolean::class.java)
     }
 
     override fun customHandleGameEnd() {
         println("custom game end")
-        thread.shutdown()
+        thread!!.shutdown()
+        thread = null
     }
 
 
@@ -102,7 +103,7 @@ class OnlineGameFragment : GeneralGameInterface() {
      */
     override fun getPlayerCoin(): Int {
         println("getter money called")
-        money = gson.fromJson(thread.getNextIncoming(), Int::class.java)
+        money = gson.fromJson(thread?.getNextIncoming(), Int::class.java)
         return money
     }
 
@@ -117,7 +118,7 @@ class OnlineGameFragment : GeneralGameInterface() {
             return stateBeforeDamage!!.player
         }
 
-        character = gson.fromJson(thread.getNextIncoming(), Character::class.java)
+        character = gson.fromJson(thread?.getNextIncoming(), Character::class.java)
         println("player : $character")
         return character
     }
@@ -160,7 +161,7 @@ class OnlineGameFragment : GeneralGameInterface() {
      */
     override fun getShopItems(): List<Item> {
         println("getting items")
-        itemSelection = gson.fromJson(thread.getNextIncoming(), ItemSelection::class.java)
+        itemSelection = gson.fromJson(thread?.getNextIncoming(), ItemSelection::class.java)
         println("decoded: $itemSelection")
         return itemSelection.selection
     }
