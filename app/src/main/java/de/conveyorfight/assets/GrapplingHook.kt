@@ -27,7 +27,7 @@ class GrapplingHook(context: Context, private val size: DisplayMetrics) {
 
     var shouldBounce = false
 
-    private val speed = 200F
+    private val speed = 300F
 
     init {
         val screenWidth: Double = size.widthPixels.toDouble()

@@ -87,24 +87,8 @@ class AiGameFragment() : GeneralGameInterface() {
         playerReservedItem = null
     }
 
-    override fun getPlayerHP(): Int {
-        return playerCharacter.hp
-    }
-
-    override fun getEnemyHP(): Int {
-        return enemyCharacter.hp
-    }
-
     override fun handleRoundEnd() {
         playerCoins += 5
-    }
-
-    override fun handleWin() {
-        //for the ai there is nothing to do here
-    }
-
-    override fun handleLoose() {
-        //for the ai there is nothing to do here
     }
 
     override fun customHandleGameEnd() {

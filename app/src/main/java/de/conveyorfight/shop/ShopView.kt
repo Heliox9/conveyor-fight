@@ -28,9 +28,8 @@ class ShopView(
     private val player: Character,
     val handlePlayerBuy: KFunction1<Item, Unit>,
     val handlePlayerItemReservation: KFunction1<Item, Unit>,
-    val handlePlayerUnreserveItem: KFunction0<Unit>,
-    private val flipView: () -> Unit
-)
+    val handlePlayerUnreserveItem: KFunction0<Unit>
+    )
     : SurfaceView(context), Runnable{
 
     private var rightArrowPosition: RectF
@@ -51,7 +50,7 @@ class ShopView(
 
     private val firstItemCurrentPosition: RectF
     private val firstItemEndPosition: RectF
-    private var itemInSpeed = 150f
+    private var itemInSpeed = 250f
     private val itemsBoughtIndexList = ArrayList<Int>()
 
     private val gameThread = Thread(this)
@@ -137,9 +136,8 @@ class ShopView(
                 fps = 1000 / timeThisFrame
             }
 
-            if(System.currentTimeMillis() - startTime >= 30000){
+            if(System.currentTimeMillis() - startTime >= 29000){
                 println("times over")
-                flipView()
                 break
             }
         }

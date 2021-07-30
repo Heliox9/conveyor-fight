@@ -4,6 +4,7 @@ import android.content.Context
 import android.graphics.*
 import android.graphics.drawable.AnimatedImageDrawable
 import android.util.DisplayMetrics
+import android.view.SurfaceHolder
 import android.view.SurfaceView
 import de.conveyorfight.R
 import de.conveyorfight.assets.Character
@@ -12,6 +13,7 @@ import kotlin.math.ceil
 
 
 // TODO: aus clonen companion objekte erstellen
+//TODO: schaden wird nicht richtig berechnet, tiles sind zu weit in der Mitte, coins rechnen während der Runde nicht
 class FightView(
     context: Context,
     val isPlayerFirst: Boolean,
@@ -19,11 +21,9 @@ class FightView(
     val playerCharacterAfterDamage: Character,
     val enemyCharacter: Character,
     val enemyCharacterAfterDamage: Character,
-    val initiateWin: () -> Unit,
-    val initiateLoose: () -> Unit,
     val handleGameEnd: () -> Unit,
-    val flipView: () -> Unit
-) : SurfaceView(context) {
+    val handleRoundEnd: () -> Unit
+) : SurfaceView(context), SurfaceHolder.Callback {
 
     private var canvas: Canvas = Canvas()
     private val paint: Paint = Paint()
@@ -47,7 +47,7 @@ class FightView(
 
     var tile: Bitmap = BitmapFactory.decodeResource(
         context.resources,
-        R.drawable.charakter_splash)
+        R.drawable.tile)
 
     init {
         //TODO: richtige Metrics bekommen, vielleicht gibt es bessere Inits für Views
@@ -59,6 +59,9 @@ class FightView(
         background = createFullScreenBitmap(background)
         characterSplash = createFullScreenBitmap(characterSplash)
 
+        heightUnit = size.heightPixels / 8
+        tile = Bitmap.createScaledBitmap(tile, heightUnit, heightUnit, false)
+
         val victorySource = ImageDecoder.createSource(context.resources, R.drawable.victory)
         victoryGif = ImageDecoder.decodeDrawable(victorySource) as AnimatedImageDrawable
 
@@ -66,9 +69,10 @@ class FightView(
         defeatGif = ImageDecoder.decodeDrawable(defeatSource) as AnimatedImageDrawable
 
         textSize = (size.heightPixels/15).toFloat()
-        heightUnit = size.heightPixels / 8
+    }
 
-        drawScene()
+    fun start () {
+        holder.addCallback(this)
     }
 
     private fun createFullScreenBitmap (bitmap: Bitmap): Bitmap {
@@ -95,90 +99,90 @@ class FightView(
     fun drawScene() { //TODO: refactor, make a setScene
         println("in FightView")
         while (true){
-            if (!holder.surface.isValid){
-                continue
-            }
+            println("while")
+            if (holder.surface.isValid) {
+                println("true!")
+                canvas = holder.lockCanvas()
+                canvas.drawBitmap(background, 0F, 0F, null)
+                drawCharacter(playerCharacter, true)
+                drawCharacter(enemyCharacter, false)
+                drawItems()
+                holder.unlockCanvasAndPost(canvas)
 
-            canvas = holder.lockCanvas()
-            canvas.drawBitmap(background, 0F, 0F, null)
-            drawCharacter(playerCharacter, true)
-            drawCharacter(enemyCharacter, false)
-            drawItems()
-            holder.unlockCanvasAndPost(canvas)
+                Thread.sleep(3000)
 
-            Thread.sleep(3000)
+                canvas = holder.lockCanvas()
+                canvas.drawBitmap(background, 0F, 0F, null)
+                drawCharacter(playerCharacter, true)
+                drawCharacter(enemyCharacter, false)
+                drawItems()
+                drawAttack(isPlayerFirst)
+                holder.unlockCanvasAndPost(canvas)
 
-            canvas = holder.lockCanvas()
-            canvas.drawBitmap(background, 0F, 0F, null)
-            drawCharacter(playerCharacter, true)
-            drawCharacter(enemyCharacter, false)
-            drawItems()
-            drawAttack(isPlayerFirst)
-            holder.unlockCanvasAndPost(canvas)
+                Thread.sleep(1000)
 
-            Thread.sleep(1000)
-
-            canvas = holder.lockCanvas()
-            canvas.drawBitmap(background, 0F, 0F, null)
-            drawCharacter(if(isPlayerFirst) playerCharacter else playerCharacterAfterDamage, true)
-            drawCharacter(if(isPlayerFirst) enemyCharacterAfterDamage else enemyCharacter, false)
-            drawItems()
-            holder.unlockCanvasAndPost(canvas)
-
-            Thread.sleep(3000)
-
-            if(enemyCharacter.hp <= 0 || playerCharacter.hp <= 0){
                 canvas = holder.lockCanvas()
                 canvas.drawBitmap(background, 0F, 0F, null)
                 drawCharacter(if(isPlayerFirst) playerCharacter else playerCharacterAfterDamage, true)
                 drawCharacter(if(isPlayerFirst) enemyCharacterAfterDamage else enemyCharacter, false)
                 drawItems()
-
-                if (isPlayerFirst){
-                    handleWin()
-                } else {
-                    handleLoose()
-                }
                 holder.unlockCanvasAndPost(canvas)
+
+                Thread.sleep(3000)
+
+                if(enemyCharacter.hp <= 0 || playerCharacter.hp <= 0){
+                    canvas = holder.lockCanvas()
+                    canvas.drawBitmap(background, 0F, 0F, null)
+                    drawCharacter(if(isPlayerFirst) playerCharacter else playerCharacterAfterDamage, true)
+                    drawCharacter(if(isPlayerFirst) enemyCharacterAfterDamage else enemyCharacter, false)
+                    drawItems()
+
+                    if (isPlayerFirst){
+                        handleWin()
+                    } else {
+                        handleLoose()
+                    }
+                    holder.unlockCanvasAndPost(canvas)
+                    break
+                }
+
+                canvas = holder.lockCanvas()
+                canvas.drawBitmap(background, 0F, 0F, null)
+                drawCharacter(if(isPlayerFirst) playerCharacter else playerCharacterAfterDamage, true)
+                drawCharacter(if(isPlayerFirst) enemyCharacterAfterDamage else enemyCharacter, false)
+                drawItems()
+                drawAttack(!isPlayerFirst)
+                holder.unlockCanvasAndPost(canvas)
+
+                Thread.sleep(1000)
+
+                canvas = holder.lockCanvas()
+                canvas.drawBitmap(background, 0F, 0F, null)
+                drawCharacter(playerCharacterAfterDamage, true)
+                drawCharacter(enemyCharacterAfterDamage, false)
+                drawItems()
+                holder.unlockCanvasAndPost(canvas)
+
+                Thread.sleep(3000)
+
+                if(enemyCharacter.hp <= 0 || playerCharacter.hp <= 0){
+                    canvas = holder.lockCanvas()
+                    canvas.drawBitmap(background, 0F, 0F, null)
+                    drawCharacter(if(isPlayerFirst) playerCharacter else playerCharacterAfterDamage, true)
+                    drawCharacter(if(isPlayerFirst) enemyCharacterAfterDamage else enemyCharacter, false)
+                    drawItems()
+
+                    if (!isPlayerFirst){
+                        handleWin()
+                    } else {
+                        handleLoose()
+                    }
+                    holder.unlockCanvasAndPost(canvas)
+                }
+                handleRoundEnd()
                 break
             }
-
-            canvas = holder.lockCanvas()
-            canvas.drawBitmap(background, 0F, 0F, null)
-            drawCharacter(if(isPlayerFirst) playerCharacter else playerCharacterAfterDamage, true)
-            drawCharacter(if(isPlayerFirst) enemyCharacterAfterDamage else enemyCharacter, false)
-            drawItems()
-            drawAttack(!isPlayerFirst)
-            holder.unlockCanvasAndPost(canvas)
-
-            Thread.sleep(1000)
-
-            canvas = holder.lockCanvas()
-            canvas.drawBitmap(background, 0F, 0F, null)
-            drawCharacter(playerCharacterAfterDamage, true)
-            drawCharacter(enemyCharacterAfterDamage, false)
-            drawItems()
-            holder.unlockCanvasAndPost(canvas)
-
-            Thread.sleep(3000)
-
-            if(enemyCharacter.hp <= 0 || playerCharacter.hp <= 0){
-                canvas = holder.lockCanvas()
-                canvas.drawBitmap(background, 0F, 0F, null)
-                drawCharacter(if(isPlayerFirst) playerCharacter else playerCharacterAfterDamage, true)
-                drawCharacter(if(isPlayerFirst) enemyCharacterAfterDamage else enemyCharacter, false)
-                drawItems()
-
-                if (!isPlayerFirst){
-                    handleWin()
-                } else {
-                    handleLoose()
-                }
-                holder.unlockCanvasAndPost(canvas)
-            }
-            break
         }
-        flipView()
     }
 
     private fun drawItems() {
@@ -285,14 +289,12 @@ class FightView(
     }
 
     private fun handleWin() {
-        initiateWin()
         victoryGif.draw(canvas)
         victoryGif.start()
         handleGameEnd()
     }
 
     private fun handleLoose() {
-        initiateLoose()
         defeatGif.draw(canvas)
         defeatGif.start()
         handleGameEnd()
@@ -303,5 +305,17 @@ class FightView(
         matrix.postScale(-1f, 1f, source.width / 2f, source.height / 2f
         )
         return Bitmap.createBitmap(source, 0, 0, source.width, source.height, matrix, true)
+    }
+
+    override fun surfaceCreated(holder: SurfaceHolder) {
+        drawScene()
+    }
+
+    override fun surfaceChanged(holder: SurfaceHolder, format: Int, width: Int, height: Int) {
+        // nothing to do here
+    }
+
+    override fun surfaceDestroyed(holder: SurfaceHolder) {
+        //nothing to do here
     }
 }
